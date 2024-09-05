@@ -7,7 +7,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createPersistedState } from 'pinia-persistedstate-plugin'
 
-import useStore from './store'
 import request from './utils/request'
 import _global from './utils/global'
 import router from './router'
@@ -22,7 +21,7 @@ pinia.use(persist)
 app.use(pinia)
 app.use(router)
 app.use(Elementplus)
-app.use(useStore())
+// app.use(useStore())
 
 app.config.globalProperties.$db = db
 

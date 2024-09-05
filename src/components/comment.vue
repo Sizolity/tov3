@@ -84,187 +84,39 @@
   </div>
 </template>
 
-<script>
-import util from '@/utils/util'
-import Vue from 'vue'
+<script setup>
+import { ref, computed } from 'vue'
+import { useCommentsStore } from '../utils/'
 
-export default {
-  props: {
-    comments: {
-      type: Array,
-      required: true
-    }
-  },
-  components: {},
-  data() {
-    return {
-      inputComment: '',
-      showItemId: '',
-      replyIndex: ''
-    }
-  },
-  computed: {
-    role() {
-      return util.userString(this.$db.get('ROLES'))
-    }
-  },
-  methods: {
-    /**
-     * 点赞
-     */
-    likeClick(item) {
-      if (item.isLike === null) {
-        Vue.$set(item, 'isLike', true)
-        item.likeNum++
-      } else {
-        if (item.isLike) {
-          item.likeNum--
-        } else {
-          item.likeNum++
-        }
-        item.isLike = !item.isLike
-      }
-    },
+const commentsStore = useCommentsStore()
+const comments = computed(() => commentsStore.comments)
+const inputComment = ref('')
+const showItemId = ref('')
+const replyIndex = ref('')
 
-    /**
-     * 点击取消按钮
-     */
-    cancel() {
-      this.showItemId = ''
-    },
+const likeComment = (item) => {
+  commentsStore.likeComment(item)
+}
 
-    /**
-     * 提交回复
-     */
-    commitComment() {
-      let date = new Date().Format('yyyy-MM-dd hh:mm:ss')
+const commitComment = async (showItemId_, inputComment_, replyIndex_) => {
+  await commentsStore.commitComment(showItemId_, inputComment_, replyIndex_)
+  inputComment.value = '' // 清空输入框
+  showItemId.value = '' // 关闭输入框
+}
 
-      let url = ''
-      if (this.$db.get('ROLES') === '"shop"') {
-        url = '/shopReply/add'
-      } else {
-        url = '/consumerReply/add'
-      }
+const deleteComment = async (idx, reply) => {
+  await commentsStore.deleteComment(idx, reply)
+}
 
-      this.$get(url, {
-        uid: this.$db.get('USER_ID'),
-        coid: this.showItemId,
-        cotime: date,
-        content: this.inputComment
-      })
-        .then((res) => {
-          // 更新父组件视图
-          this.$emit('add', this.replyIndex, {
-            id: String(this.showItemId) + String(this.$db.get('USER_ID')), //主键id, 感觉没卵用
-            commentId: this.comments[this.replyIndex].id, //父评论id，即父亲的id
-            fromId: this.$db.get('USER_ID'), //评论者id
-            fromName:
-              util.userString(this.$db.get('USER')) +
-              (this.$db.get('ROLES') === '"shop"' ? '(商家)' : ''), //评论者昵称
-            fromAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg', //评论者头像
-            toId: this.comments[this.replyIndex].fromId, //被评论者id
-            toName: this.comments[this.replyIndex].fromName, //被评论者昵称
-            toAvatar: 'http://ww4.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2pddjuj30v90uvagf.jpg', //被评论者头像
-            content: this.inputComment, //评论内容
-            date: date, //评论时间
-            replyRole: util.userString(this.$db.get('ROLES'))
-          })
-          // input框变为空
-          this.inputComment = ''
-          // 收起输入框
-          this.showItemId = ''
-          this.$message({
-            type: 'info',
-            message: '添加成功',
-            center: true
-          })
-        })
-        .catch((err) => {
-          console.log(err)
-          this.$message({
-            type: 'error',
-            message: '添加失败，可能出了点错误',
-            center: true
-          })
-        })
-    },
+const showCommentInput = (idx, item) => {
+  inputComment.value = '' // Reset input comment
+  replyIndex.value = idx
+  showItemId.value = item.id
+  item.show = true // 展开输入框
+}
 
-    /**
-     * 点击评论按钮显示输入框
-     * item: 当前大评论
-     * reply: 当前回复的评论
-     */
-    showCommentInput(idx, item, reply) {
-      if (reply) {
-        this.inputComment = '@' + reply.fromName + ' '
-      } else {
-        this.inputComment = ''
-      }
-      this.replyIndex = idx
-      this.showItemId = item.id
-      item.show = true
-    },
-
-    /**
-     * 展开或折叠回复
-     */
-    changeOpenReply(item) {
-      item.show = !item.show
-    },
-
-    /**
-     * 删除评论
-     */
-    deleteComment(idx, ridx, item, reply) {
-      console.log(reply.fromId)
-
-      let url = ''
-      if (this.$db.get('ROLES') === '"shop"') {
-        url = '/shopReply/delete'
-      } else {
-        url = '/consumerReply/delete'
-      }
-      // 开始删掉这条回复
-      this.$confirm('是否确认删除此条回复?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          this.$get(url, {
-            uid: this.$db.get('USER_ID'),
-            coid: reply.commentId,
-            date: reply.date
-          })
-            .then((res) => {
-              // 更新父组件视图
-              this.$emit('remove', idx, ridx)
-              this.$message({
-                type: 'info',
-                message: '已删除',
-                center: true
-              })
-            })
-            .catch((err) => {
-              this.$message({
-                type: 'error',
-                message: '出了点问题呢，联系一下管理员吧~',
-                center: true
-              })
-            })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消',
-            center: true
-          })
-        })
-    }
-  },
-  created() {
-    console.log(this.$db.get('USER_ID'))
-  }
+const cancel = () => {
+  showItemId.value = '' // Hide input
 }
 </script>
 
@@ -407,7 +259,7 @@ export default {
         padding: 10px;
         .gray-bg-input,
         .el-input__inner {
-          /*background-color: #67C23A;*/
+          background-color: #67c23a;
         }
         .btn-control {
           display: flex;

@@ -44,7 +44,7 @@
 
       <el-row>
         <el-button type="warning" class="login-btn" v-on:click="onSubmit">提 交</el-button>
-        <el-button class="login-btn" v-on:click="$router.push('/login')">返回登录</el-button>
+        <el-button class="login-btn" v-on:click="router.push('/login')">返回登录</el-button>
       </el-row>
     </el-form>
 
@@ -71,14 +71,22 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useSyspostStore } from '@/store/modules/pwdre'
+import { ref } from 'vue'
+import { useAccountStore } from '../../stores/account' // Adjust path as needed
+import { useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import jwtDecode from 'jwt-decode'
-import { ElMessage, ElConfirm } from 'element-plus'
+import { syspost } from '@/utils/request'
 
-const store = useSyspostStore()
+// proxy代理
+const proxy = getCurrentInstance()
+// const syspost = syspost
+//
+const router = useRoute()
 
-// 响应式数据
+const store = useAccountStore()
+const route = useRoute()
+
 const form = ref({
   phone: '',
   code: ''
@@ -95,75 +103,65 @@ const dialogForm = ref({
 
 // 表单验证规则
 const rules = {
-  phone: [{ required: true, message: '手机号不可为空', trigger: 'blur' }],
-  code: [{ required: true, message: '验证码不可为空', trigger: 'blur' }]
+  username: [{ required: true, message: '手机号不能为空', trigger: 'blur' }],
+  password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
 }
-
-// 获取角色
-const role = computed(() => {
-  return route.params.role
-})
 
 // 发送验证码
-const sendcode = () => {
+function sendCode() {
   const reg = /^((13|14|15|17|18)[0-9]\d{8})$/
   if (form.value.phone === '') {
-    ElMessage.error('手机号不能为空')
+    ElMessage({ message: '手机号不能为空', type: 'error', center: true })
     return
   }
   if (!reg.test(form.value.phone)) {
-    ElMessage.error('请输入正确的手机号')
-    return
+    ElMessage({ message: '请输入正确的手机号', type: 'error', center: true })
+  } else {
+    // 发送短信验证码
+    syspost('/sms/smsXxs', { phone: form.value.phone })
+      .then((res) => {
+        if (res.data.isOk === 'OK') {
+          ElMessage({ message: '发送成功，请注意接收', type: 'success', center: true })
+          verifyCode.value = res.data.verifyCode
+          time.value = 60
+          disabled.value = true
+          timer()
+        } else {
+          ElMessage({ message: '发送出错，可能服务器发生了错误', type: 'error', center: true })
+        }
+      })
+      .catch((err) => console.log(err))
   }
-
-  store
-    .dispatch('syspost', {
-      url: '/sms/smsXxs',
-      data: { phone: form.value.phone }
-    })
-    .then((res) => {
-      if (res.data.isOk === 'OK') {
-        ElMessage.success('发送成功，请注意接收')
-        verifyCode.value = res.data.verifyCode
-        startTimer()
-      } else {
-        ElMessage.error('发送出错，可能服务器发生了错误')
-      }
-    })
-    .catch((err) => console.error(err))
 }
 
-// 启动60秒倒计时
-const startTimer = () => {
-  time.value = 60
-  disabled.value = true
-  btntxt.value = time.value + 's后重新获取'
-  const interval = setInterval(() => {
-    if (time.value > 0) {
-      time.value--
-      btntxt.value = time.value + 's后重新获取'
-    } else {
-      clearInterval(interval)
-      btntxt.value = '获取验证码'
-      disabled.value = false
-    }
-  }, 1000)
+// 倒计时
+function timer() {
+  if (time.value > 0) {
+    time.value--
+    btntxt.value = time.value + 's后重新获取'
+    setTimeout(timer, 1000)
+  } else {
+    time.value = 0
+    btntxt.value = '获取验证码'
+    disabled.value = false
+  }
 }
 
-// 提交处理
-const onSubmit = () => {
+// 提交表单
+function onSubmit() {
   const reg = /^((13|14|15|17|18)[0-9]\d{8})$/
   if (form.value.phone === '') {
-    ElMessage.error('手机号不能为空')
+    // 替换this.$message
+    ElMessage({ message: '手机号不能为空', type: 'error', center: true })
     return
   }
   if (!reg.test(form.value.phone)) {
-    ElMessage.error('请输入正确的手机号')
+    ElMessage({ message: '请输入正确的手机号', type: 'error', center: true })
     return
   }
   if (
-    form.value.phone !== '' &&
-    form.value.code !== '' &&
+    form.value.phone &&
+    form.value.code &&
     verifyCode.value.length === 6 &&
     form.value.code === verifyCode.value
   ) {
@@ -171,40 +169,36 @@ const onSubmit = () => {
   }
 }
 
-// 关闭对话框确认
-const handleClose = (done) => {
-  ElConfirm({
-    title: '提示',
-    message: '将丢失操作，确认关闭？'
-  })
-    .then(done)
+// 处理对话框关闭
+function handleClose(done) {
+  ElMessage('将丢失操作，确认关闭？')
+    .then(() => {
+      done()
+    })
     .catch(() => {})
 }
 
-// 更改密码
-const changeFinish = () => {
+// 修改密码
+function changeFinish() {
   if (dialogForm.value.pass !== dialogForm.value.newPass) {
-    ElMessage.error('两次密码不一致')
+    ElMessage({ message: '两次密码不一致', type: 'error' })
     return
   }
 
-  let url =
-    role.value === 'consumer'
+  const url =
+    route.params.role === 'consumer'
       ? '/consumer/changePasswordByPhoneCode'
       : '/shop/changePasswordByPhoneCode'
 
-  store
-    .dispatch('syspost', {
-      url,
-      data: {
-        telephone: form.value.phone,
-        password: dialogForm.value.pass
-      }
-    })
+  syspost(url, {
+    telephone: form.value.phone,
+    password: dialogForm.value.pass
+  })
     .then((res) => {
-      ElConfirm({
-        title: '提示',
-        message: '重置密码成功，是否直接登录?'
+      ElMessage('重置密码成功，是否直接登录?', '提示', {
+        confirmButtonText: '直接登录',
+        cancelButtonText: '返回登录界面',
+        type: 'warning'
       })
         .then(() => {
           doLogin()
@@ -213,40 +207,38 @@ const changeFinish = () => {
           router.push('/login')
         })
     })
-    .catch((err) => console.error(err))
+    .catch((err) => console.log(err))
 }
 
-// 登录
-const doLogin = () => {
-  let url = role.value === 'consumer' ? '/consumer/loginWithoutPass' : '/shop/loginWithoutPass'
+// 保存登录状态
+const saveLogin = (data) => {
+  const decode = jwtDecode(data.data)
+  store.setToken(data.data)
+  store.setExpireTime(decode.expire_time)
+  store.setUser(decode.username)
+  store.setPermissions(decode.permission)
+  store.setRoles(decode.roles)
+  store.setId(decode.id)
+  store.setInfo(data.info)
+}
 
-  store
-    .dispatch('syspost', {
-      url,
-      data: { telephone: form.value.phone }
-    })
+// 登录方法
+function doLogin() {
+  const url =
+    route.params.role === 'consumer' ? '/consumer/loginWithoutPass' : '/shop/loginWithoutPass'
+
+  syspost(url, {
+    telephone: form.value.phone
+  })
     .then((r) => {
       saveLogin(r.data)
       router.push('/index')
       location.reload()
     })
     .catch((err) => {
-      ElMessage.error('服务器错误啦')
-      store.dispatch('clearUserData')
+      ElMessage({ message: '服务器错误啦', type: 'error', center: true })
+      proxy.$db.clear()
     })
-}
-
-// 保存登录数据
-const saveLogin = (data) => {
-  const decode = jwtDecode(data.data)
-
-  store.commit('account/setToken', data.data)
-  store.commit('account/setExpireTime', decode.expire_time)
-  store.commit('account/setUser', decode.username)
-  store.commit('account/setPermissions', decode.permission)
-  store.commit('account/setRoles', decode.roles)
-  store.commit('account/setId', decode.id)
-  store.commit('account/setInfo', data.info)
 }
 </script>
 

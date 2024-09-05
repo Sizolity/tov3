@@ -59,15 +59,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useSyspostStore } from '@/store/modules/pwdre'
-import useAppStore from '@/store/setting'
-import useAuthStore from '@/store/account'
+import { getCurrentInstance, ref } from 'vue'
+import { useSyspostStore } from '../../stores/pwdre'
+import { useAccountStore } from '../../stores/updateAccount'
 
 import { jwtDecode } from 'jwt-decode'
 import { ElNotification } from 'element-plus'
 
-const store = useSyspostStore()
+const syspostStore = useSyspostStore()
+const accountStore = { useAccountStore }()
 
 // 响应式数据
 const radio = ref(1)
@@ -75,6 +75,8 @@ const form = ref({
   username: '',
   password: ''
 })
+
+const proxy = getCurrentInstance()
 
 // 表单验证规则
 const rules = {
@@ -91,8 +93,8 @@ const onSubmit = (formName) => {
   if (valid) {
     let url = radio.value === 1 ? 'consumer/login' : 'shop/login'
 
-    store
-      .dispatch('syspost', {
+    syspostStore
+      .syspost({
         url,
         data: {
           username: form.value.username,
@@ -111,7 +113,7 @@ const onSubmit = (formName) => {
           message: '账号或密码错误'
         })
         // 清空用户信息
-        store.dispatch('clearUserData')
+        proxy.$db.clear('clearUserData')
       })
   } else {
     dialogVisible.value = true
@@ -122,13 +124,13 @@ const onSubmit = (formName) => {
 const saveLoginData = (data) => {
   const decode = jwtDecode(data.data)
 
-  store.commit('account/setToken', data.data)
-  store.commit('account/setExpireTime', decode.expire_time)
-  store.commit('account/setUser', decode.username)
-  store.commit('account/setPermissions', decode.permission)
-  store.commit('account/setRoles', decode.roles)
-  store.commit('account/setId', decode.id)
-  store.commit('account/setInfo', data.info)
+  accountStore.setToken(data.data)
+  accountStore.setExpireTime(decode.expire_time)
+  accountStore.setUser(decode.username)
+  accountStore.setPermissions(decode.permission)
+  accountStore.setRoles(decode.roles)
+  accountStore.setId(decode.id)
+  accountStore.setInfo(data.info)
 }
 
 // 重置密码

@@ -61,12 +61,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { defineStore } from 'pinia'
+import { useAccountStore } from '@/stores/updateAccount'
 import jwtDecode from 'jwt-decode'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const store = useStore()
+const store = useAccountStore()
 const formRef = ref(null)
 
 const radio = ref(1)
@@ -179,13 +179,13 @@ const onSubmit = () => {
 // 保存登录状态
 const saveLogin = (data) => {
   const decode = jwtDecode(data.data)
-  store.commit('account/setToken', data.data)
-  store.commit('account/setExpireTime', decode.expire_time)
-  store.commit('account/setUser', decode.username)
-  store.commit('account/setPermissions', decode.permission)
-  store.commit('account/setRoles', decode.roles)
-  store.commit('account/setId', decode.id)
-  store.commit('account/setInfo', data.info)
+  store.setToken(data.data)
+  store.setExpireTime(decode.expire_time)
+  store.setUser(decode.username)
+  store.setPermissions(decode.permission)
+  store.setRoles(decode.roles)
+  store.setId(decode.id)
+  store.setInfo(data.info)
 }
 </script>
 

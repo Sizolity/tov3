@@ -1,7 +1,7 @@
 import axios from 'axios'
 import db from './localstorage'
 import { ElDialog, ElNotification, ElMessageBox, ElMessage } from 'element-plus'
-import useAuthStore from '../store/account'
+import useAuthStore from '../stores/account'
 import moment from 'moment'
 moment.locale('zh-cn')
 useStore = useAuthStore()

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-const useSyspostStore = defineStore('syspost', {
+export const useSyspostStore = defineStore('usesyspost', {
   state: () => ({
     url: '/sms/smsXxs',
     data: { phone: '' }
