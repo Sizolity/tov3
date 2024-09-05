@@ -1,19 +1,11 @@
 <template>
-    <div>{{text}}</div>
+  <div>{{ text }}</div>
 </template>
 
-<script>
-  export default {
-    name: "NotFound",
-    props: ['content'],
-    data() {
-      return {
-        text: this.content
-      }
-    }
-  }
+<script setup>
+import { defineProps } from 'vue'
+const props = defineProps(['content'])
+const text = props.content
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

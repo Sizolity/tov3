@@ -5,12 +5,8 @@
   </div>
 </template>
 
-<script>
-import ContactDialog from '@/components/ContactDialog.vue'
-export default {
-  name: 'Contact',
-  components: { ContactDialog }
-}
+<script setup>
+import ContactDialog from '/src/components/ContactDialog.vue'
 </script>
 
 <style scoped></style>

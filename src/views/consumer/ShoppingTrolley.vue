@@ -535,208 +535,163 @@
   </div>
 </template>
 
-<script>
-import util from '@/utils/util'
-import ContactDialog from '@/components/ContactDialog.vue'
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue'
+import util from '../../utils/util'
+import ContactDialog from '../../components/ContactDialog.vue'
 
-export default {
-  name: 'ShoppingTrolley',
-  components: { ContactDialog },
-  data() {
-    return {
-      title: '店铺服务星级评价',
-      radio: '全部',
-      id: '',
-      activeName: 'first',
-      value: '',
+const title = ref('店铺服务星级评价')
+const radio = ref('全部')
+const id = ref('')
+const activeName = ref('first')
+const value = ref('')
 
-      orderList: [
-        {
-          cid: 1,
-          consumerName: 'Zhang San',
-          gid: 22,
-          goodsName: '烤鲈鱼',
-          id: 18,
-          num: 3,
-          picture: 'http://localhost:8080/takeout/upload/201907022120098.jpg',
-          price: 120,
-          shopName: 'mai',
-          sid: 1,
-          state: '未完成',
-          time: '2019-07-07 16:45:16',
-          total: 120
-        }
-      ],
-      dialogTableVisible: false,
-      dialogFormVisible: false,
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
-      },
-      formLabelWidth: '120px',
-      fromLabelHeight: '80px',
+const orderList = ref([])
+const dialogTableVisible = ref(false)
+const dialogFormVisible = ref(false)
+const form = reactive({
+  name: '',
+  region: '',
+  date1: '',
+  date2: '',
+  delivery: false,
+  type: [],
+  resource: '',
+  desc: ''
+})
+const formLabelWidth = '120px'
+const fromLabelHeight = '80px'
 
-      commentForm: {
-        content: '',
-        stars: 0
-      },
-      nowSubmit: '',
+const commentForm = reactive({
+  content: '',
+  stars: 0
+})
+const nowSubmit = ref('')
+const dialogContactVisible = ref(false)
+const nowContactShop = ref('')
+const formatData = ref([])
 
-      dialogContactVisible: false,
-      nowContactShop: '',
+// API Call in onMounted
+onMounted(() => {
+  // Assume there’s a global API function `$get`
+  const userId = localStorage.getItem('USER_ID') // Replace with your local storage retrieval or Vuex
+  fetchOrderHistory(userId)
+})
 
-      // FIXME: NEW 展示数据
-      formatData: []
-      // 分页
-    }
-  },
-  created() {
-    this.$get('/consumer/getOrderHistory', {
-      CID: this.$db.get('USER_ID')
-    })
-      .then((res) => {
-        console.log(res.data)
-        this.orderList = res.data.data
-        //
-        this.formatData = util.filterByTimeAndName(this.orderList, 'time', 'shopName')
-      })
-      .catch((err) => console.log(err))
-  },
-
-  methods: {
-    filterTag(value, row) {
-      return row.state === value
-    },
-    tagType(row) {
-      switch (row.state) {
-        case '已完成':
-          return 'primary'
-        case '未完成':
-          return 'danger'
-        case '待评价':
-          return 'warning'
-        case '已取消':
-          return 'info'
-      }
-    },
-
-    handleClick(tab, event) {
-      console.log(tab, event)
-    },
-
-    cancelOrder(row) {
-      // console.log(row)
-      this.$confirm('是否确认取消此订单?', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          this.$get('/consumer/cancelOrder', {
-            OID: row.id
-          }).then(() => {
-            // console.log(res.data);
-            for (let i = 0; i < this.orderList.length; i++) {
-              if (row.id === this.orderList[i].id) {
-                this.$set(this.orderList[i], 'state', '已取消')
-                this.$message({ type: 'success', message: '已成功取消该订单' })
-              }
-            }
-          })
-        })
-        .catch((err) => {
-          console.log(err)
-          this.$message({ type: 'info', message: '取消操作' })
-        })
-    },
-    cancelSomeOrder(row) {
-      this.$confirm('注意:此操作只会取消此订单内未完成的商品,是否继续?', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async () => {
-          for (let order of row) {
-            if (order.state !== '未完成') return
-            await this.$get('/consumer/cancelOrder', { OID: order.id }).then((res) => {
-              for (let i = 0; i < this.orderList.length; i++) {
-                if (order.id === this.orderList[i].id) {
-                  this.$set(this.orderList[i], 'state', '已取消')
-                }
-              }
-            })
-          }
-          this.$message({ type: 'success', message: '已成功取消该订单' })
-        })
-        .catch(() => {
-          this.$message({ type: 'info', message: '取消操作' })
-        })
-    }, //
-
-    submitComment(row) {
-      let date = new Date().Format('yyyy-MM-dd hh:mm:ss')
-      console.log(this.commentForm.content)
-      console.log(this.commentForm.stars)
-      this.$get('/commentary/addCommentary', {
-        cid: this.$db.get('USER_ID'),
-        sid: row.sid,
-        cotime: date,
-        content: this.commentForm.content,
-        stars: this.commentForm.stars
-      }).then(async (res) => {
-        // console.log(res.data.content);
-        this.commentForm.content = ''
-        this.commentForm.stars = 0
-        this.dialogFormVisible = false
-        this.$message({
-          type: 'info',
-          message: '评价成功！'
-        })
-        for (let order of row) {
-          // FIXME: 完成所有订单
-          if (order.state !== '待评价') return
-          await this.$get('/ShoppingCart/finishOrder', { OID: order.id })
-          for (let i = 0; i < this.orderList.length; i++) {
-            if (order.id === this.orderList[i].id) {
-              this.$set(this.orderList[i], 'state', '已完成')
-            }
-          }
-        }
-      })
-    },
-
-    readyToComment(row) {
-      this.nowSubmit = row
-      this.dialogFormVisible = true
-    },
-
-    contactTo(row) {
-      this.nowContactShop = row.sid
-      this.dialogContactVisible = true
-    },
-
-    notFinishPrice(row) {
-      let data = row.filter((x) => x.state === '未完成')
-      let res = 0
-      for (let order of data) {
-        res += order.total
-      }
-      return res
-    }
-  },
-
-  computed: {
-    dataInPage() {
-      return this.formatData
-    }
+const fetchOrderHistory = async (userId) => {
+  try {
+    const res = await $get('/consumer/getOrderHistory', { CID: userId })
+    console.log(res.data)
+    orderList.value = res.data.data
+    formatData.value = util.filterByTimeAndName(orderList.value, 'time', 'shopName')
+  } catch (err) {
+    console.log(err)
   }
 }
+
+// Methods
+const filterTag = (value, row) => {
+  return row.state === value
+}
+
+const tagType = (row) => {
+  switch (row.state) {
+    case '已完成':
+      return 'primary'
+    case '未完成':
+      return 'danger'
+    case '待评价':
+      return 'warning'
+    case '已取消':
+      return 'info'
+  }
+}
+
+const handleClick = (tab, event) => {
+  console.log(tab, event)
+}
+
+const cancelOrder = async (row) => {
+  // Show confirmation dialog
+  await confirm('是否确认取消此订单?')
+    .then(async () => {
+      await $get('/consumer/cancelOrder', { OID: row.id })
+      for (let order of orderList.value) {
+        if (row.id === order.id) {
+          order.state = '已取消'
+          $message({ type: 'success', message: '已成功取消该订单' })
+        }
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+      $message({ type: 'info', message: '取消操作' })
+    })
+}
+
+const cancelSomeOrder = async (row) => {
+  await confirm('注意:此操作只会取消此订单内未完成的商品,是否继续?')
+    .then(async () => {
+      for (let order of row) {
+        if (order.state !== '未完成') continue
+        await $get('/consumer/cancelOrder', { OID: order.id }).then(() => {
+          for (let orderItem of orderList.value) {
+            if (order.id === orderItem.id) {
+              orderItem.state = '已取消'
+            }
+          }
+        })
+      }
+      $message({ type: 'success', message: '已成功取消该订单' })
+    })
+    .catch(() => {
+      $message({ type: 'info', message: '取消操作' })
+    })
+}
+
+const submitComment = async (row) => {
+  const date = new Date().toISOString().slice(0, 19).replace('T', ' ') // Format
+  await $get('/commentary/addCommentary', {
+    cid: localStorage.getItem('USER_ID'),
+    sid: row.sid,
+    cotime: date,
+    content: commentForm.content,
+    stars: commentForm.stars
+  }).then(async () => {
+    commentForm.content = ''
+    commentForm.stars = 0
+    dialogFormVisible.value = false
+    $message({ type: 'info', message: '评价成功！' })
+
+    for (let order of row) {
+      if (order.state !== '待评价') return
+      await $get('/ShoppingCart/finishOrder', { OID: order.id })
+      for (let orderItem of orderList.value) {
+        if (order.id === orderItem.id) {
+          orderItem.state = '已完成'
+        }
+      }
+    }
+  })
+}
+
+const readyToComment = (row) => {
+  nowSubmit.value = row
+  dialogFormVisible.value = true
+}
+
+const contactTo = (row) => {
+  nowContactShop.value = row.sid
+  dialogContactVisible.value = true
+}
+
+const notFinishPrice = (row) => {
+  const data = row.filter((x) => x.state === '未完成')
+  return data.reduce((res, order) => res + order.total, 0)
+}
+
+// Computed
+const dataInPage = computed(() => formatData.value)
 </script>
 
 <style scoped>

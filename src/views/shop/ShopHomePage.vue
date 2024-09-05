@@ -6,9 +6,9 @@
   </el-container>
 </template>
 
-<script>
+<script setup>
 import { ref, onMounted } from 'vue'
-import comment from '@/components/comment.vue'
+import comment from '/src/components/comment.vue'
 
 // 获取当前实例
 const { proxy } = getCurrentInstance()

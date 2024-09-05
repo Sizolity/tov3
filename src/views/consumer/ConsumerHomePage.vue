@@ -76,61 +76,108 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import userAddress from '@/components/Address.vue'
+import { inject, onMounted } from 'vue'
 
-export default {
-  name: 'ConsumerHomePage',
-  components: {
-    userAddress
-  },
-  created() {
-    this.$get('/shop/getAllShopInfo')
-      .then((res) => {
-        this.shopList = res.data.data
-        this.dataInPage = this.shopList.filter(
-          (data) => !this.input || data.sName.toLowerCase().includes(this.input.toLowerCase())
-        )
-      })
-      .catch((err) => console.log(err))
-  },
-  data() {
-    return {
-      num: 1,
-      radio: '全部',
-      input: '',
-      tableData: [],
-      card: [],
+const $get = inject('$get')
 
-      dataInPage: [],
-      shopList: [
-        {
-          managerEmail: '',
-          managerName: '',
-          sAddress: '',
-          sId: 1,
-          sName: '',
-          sPassword: '',
-          sPictureUrl: null,
-          sTel: '',
-          score: 1
-        }
-      ]
-    }
-  },
-  methods: {
-    // @[我们前端写的，不知道有什么用]
-    cardMessage(val) {
-      this.card = val
-    },
-    // 搜索
-    searchShop() {
-      this.dataInPage = this.shopList.filter(
+//data
+
+const shopList = ref([
+  {
+    managerEmail: '',
+    managerName: '',
+    sAddress: '',
+    sId: 1,
+    sName: '',
+    sPassword: '',
+    sPictureUrl: null,
+    sTel: '',
+    score: 1
+  }
+])
+const dataInPage = ref([])
+const input = ref('')
+const num = ref(1)
+const radio = ref('全部')
+const tableData = ref([])
+const card = ref([])
+
+onMounted(() => {
+  $get('/shop/getAllShopInfo')
+    .then((res) => {
+      shopList = res.data.data
+      dataInPage = this.shopList.filter(
         (data) => !this.input || data.sName.toLowerCase().includes(this.input.toLowerCase())
       )
-    }
-  }
+    })
+    .catch((err) => console.log(err))
+})
+
+// methods
+const cardMessage = (val) => {
+  card = val
 }
+
+const searchShop = () => {
+  dataInPage = shopList.filter(
+    (data) => !input || data.sName.toLowerCase().includes(input.toLowerCase())
+  )
+}
+
+// export default {
+//   name: 'ConsumerHomePage',
+//   components: {
+//     userAddress
+//   },
+//   created() {
+//     this.$get('/shop/getAllShopInfo')
+//       .then((res) => {
+//         this.shopList = res.data.data
+//         this.dataInPage = this.shopList.filter(
+//           (data) => !this.input || data.sName.toLowerCase().includes(this.input.toLowerCase())
+//         )
+//       })
+//       .catch((err) => console.log(err))
+//   },
+//   data() {
+//     return {
+//       num: 1,
+//       radio: '全部',
+//       input: '',
+//       tableData: [],
+//       card: [],
+
+//       dataInPage: [],
+//       shopList: [
+//         {
+//           managerEmail: '',
+//           managerName: '',
+//           sAddress: '',
+//           sId: 1,
+//           sName: '',
+//           sPassword: '',
+//           sPictureUrl: null,
+//           sTel: '',
+//           score: 1
+//         }
+//       ]
+//     }
+//   },
+//   methods: {
+//     // @[我们前端写的，不知道有什么用]
+//     cardMessage(val) {
+//       this.card = val
+//     },
+//     // 搜索
+//     searchShop() {
+//       this.dataInPage = this.shopList.filter(
+//         (data) => !this.input || data.sName.toLowerCase().includes(this.input.toLowerCase())
+//       )
+//     }
+//   }
+// }
 </script>
 
 <style scoped>

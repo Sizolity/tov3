@@ -88,79 +88,141 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import NotFound from '@/components/NotFound.vue'
 import Menu from './Menu.vue'
 import Commentary from './Commentary.vue'
 import ContactDialog from '@/components/ContactDialog.vue'
+import { onMounted, ref, watch } from 'vue'
 
-export default {
-  name: 'ShopDetail',
-  components: { ContactDialog, NotFound, Menu, Commentary },
-  data() {
-    return {
-      activeName: 'first',
-      index: 1,
+// data
+const activeName = ref('first')
+const index = ref(1)
 
-      SID: '',
-      found: true,
+const SID = ref('')
+const found = ref(true)
 
-      shop: {
-        address: 1,
-        id: 1,
-        managerEmail: 1,
-        managerName: 1,
-        pictureUrl: 1,
-        score: 1,
-        telephone: 1,
-        username: 1
-      }
-    }
-  },
-  created() {
-    // console.log(this.$route.params)
-    this.SID = this.$route.params.id
-    this.refreshPage()
-  },
-  watch: {
-    $route(to, from) {
-      // console.log(this.$route.params)
-      this.SID = this.$route.params.id
-      this.refreshPage()
-    }
-  },
-  methods: {
-    // 根据 SID 重新刷新页面
-    refreshPage() {
-      // 商家信息
-      this.$get('/shop/getInfoBySid', {
-        SID: this.SID
-      })
-        .then((res) => {
-          // console.log(res.data);
-          this.shop = res.data.data
-          this.found = true
-        })
-        .catch((err) => {
-          console.log(err)
-          // 没找到此商店
-          this.found = false
-        })
-    },
-    index1() {
-      this.index = 1
-      console.log(this.index)
-    },
-    index2() {
-      this.index = 2
-      console.log(this.index)
-    },
-    index3() {
-      this.index = 3
-      console.log(this.index)
-    }
-  }
+const shop = ref({
+  address: 1,
+  id: 1,
+  managerEmail: 1,
+  managerName: 1,
+  pictureUrl: 1,
+  score: 1,
+  telephone: 1,
+  username: 1
+})
+
+onMounted = () => {
+  SID.value = this.$route.params.SID
+  refreshPage()
 }
+
+//todo
+watch(
+  () => $route(to, from),
+  () => {
+    SID.value = this.$route.params.SID
+    refreshPage
+  }
+)
+
+const refreshPage = () => {
+  // 商家信息
+  this.$get('/shop/getInfoBySid', {
+    SID: this.SID
+  })
+    .then((res) => {
+      // console.log(res.data);
+      this.shop = res.data.data
+      this.found = true
+    })
+    .catch((err) => {
+      console.log(err)
+      // 没找到此商店
+      this.found = false
+    })
+}
+const index1 = () => {
+  this.index = 1
+  console.log(this.index)
+}
+const index2 = () => {
+  this.index = 2
+  console.log(this.index)
+}
+const index3 = () => {
+  this.index = 3
+  console.log(this.index)
+}
+
+// export default {
+//   name: 'ShopDetail',
+//   components: { ContactDialog, NotFound, Menu, Commentary },
+//   data() {
+//     return {
+//       activeName: 'first',
+//       index: 1,
+
+//       SID: '',
+//       found: true,
+
+//       shop: {
+//         address: 1,
+//         id: 1,
+//         managerEmail: 1,
+//         managerName: 1,
+//         pictureUrl: 1,
+//         score: 1,
+//         telephone: 1,
+//         username: 1
+//       }
+//     }
+//   },
+//   created() {
+//     // console.log(this.$route.params)
+//     this.SID = this.$route.params.id
+//     this.refreshPage()
+//   },
+//   watch: {
+//     $route(to, from) {
+//       // console.log(this.$route.params)
+//       this.SID = this.$route.params.id
+//       this.refreshPage()
+//     }
+//   },
+//   methods: {
+//     // 根据 SID 重新刷新页面
+//     refreshPage() {
+//       // 商家信息
+//       this.$get('/shop/getInfoBySid', {
+//         SID: this.SID
+//       })
+//         .then((res) => {
+//           // console.log(res.data);
+//           this.shop = res.data.data
+//           this.found = true
+//         })
+//         .catch((err) => {
+//           console.log(err)
+//           // 没找到此商店
+//           this.found = false
+//         })
+//     },
+//     index1() {
+//       this.index = 1
+//       console.log(this.index)
+//     },
+//     index2() {
+//       this.index = 2
+//       console.log(this.index)
+//     },
+//     index3() {
+//       this.index = 3
+//       console.log(this.index)
+//     }
+//   }
+// }
 </script>
 
 <style scoped>

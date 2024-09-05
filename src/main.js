@@ -21,18 +21,18 @@ pinia.use(persist)
 app.use(pinia)
 app.use(router)
 app.use(Elementplus)
-// app.use(useStore())
 
-app.config.globalProperties.$db = db
+// app 顶层函数，全局变量 注入
+app.provide('$db', db)
 
 // axios全局配置
-app.config.globalProperties.$post = request.post
-app.config.globalProperties.$get = request.get
-app.config.globalProperties.$put = request.put
-app.config.globalProperties.$delete = request.delete
-app.config.globalProperties.$syspost = request.syspost
-app.config.globalProperties.$sysget = request.sysget
-app.config.globalProperties.GLOBAL = _global // 定义全局变量
+app.provide('$post', request.post)
+app.provide('$get', request.get)
+app.provide('$put', request.put)
+app.provide('$delete', request.delete)
+app.provide('$syspost', request.syspost)
+app.provide('$sysget', request.sysget)
+app.provide('GLOBAL', _global) // 定义全局变量
 
 // js 时间格式化
 Date.prototype.Format = function (fmt) {

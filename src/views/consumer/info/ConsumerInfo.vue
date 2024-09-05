@@ -1,10 +1,15 @@
 <template>
   <el-container style="height: 600px; border: 1px solid #eee">
-    <el-aside >
+    <el-aside>
       <el-row class="tac">
         <el-col>
           <h5>个人信息</h5>
-          <el-menu :default-active="nowPageIndex" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
+          <el-menu
+            :default-active="nowPageIndex"
+            class="el-menu-vertical-demo"
+            @open="handleOpen"
+            @close="handleClose"
+          >
             <el-menu-item index="1" class="title" @click="$router.push('/consumerinfo/info')">
               <i class="el-icon-user"></i>
               <span slot="title">个人资料</span>
@@ -31,52 +36,58 @@
     </el-aside>
 
     <el-main>
-<!--      <component :is="componentName"></component>-->
+      <!--      <component :is="componentName"></component>-->
       <router-view></router-view>
     </el-main>
   </el-container>
 </template>
 
-<script>
-  export default {
-    name: "ConsumerInfo",
-    methods: {
-      handleOpen(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      handleClose(key, keyPath) {
-        console.log(key, keyPath);
-      }
-    },
-    computed: {
-      nowPageIndex() {
-        if (this.$route.path === '/consumerinfo/info') {
-          return "1"
-        } else if (this.$route.path === '/consumerinfo/history') {
-          return "2"
-        } else if (this.$route.path === '/consumerinfo/contact') {
-          return "3"
-        } else if (this.$route.path === '/consumerinfo/password') {
-          return "4"
-        } else if (this.$route.path === '/consumerinfo/setting') {
-          return "5"
-        } else {
-          return "1"
-        }
-      }
-    }
+<script setup>
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Method to handle opening
+const handleOpen = (key) => {
+  console.log(key)
+  // 这里可以添加打开页面的逻辑
+}
+
+// Method to handle closing
+const handleClose = (key) => {
+  console.log(key)
+  // 这里可以添加关闭页面的逻辑
+}
+
+// Computed property to determine the current page index
+const nowPageIndex = computed(() => {
+  switch (route.path) {
+    case '/consumerinfo/info':
+      return '1'
+    case '/consumerinfo/history':
+      return '2'
+    case '/consumerinfo/contact':
+      return '3'
+    case '/consumerinfo/password':
+      return '4'
+    case '/consumerinfo/setting':
+      return '5'
+    default:
+      return '1'
   }
+})
 </script>
 
 <style scoped>
-.title:hover{
-  color:#FFCD56;
-  border-color: #FFCD56;
-  background-color: rgba(255,205,86,0.1);
+.title:hover {
+  color: #ffcd56;
+  border-color: #ffcd56;
+  background-color: rgba(255, 205, 86, 0.1);
 }
-.title:focus{
-  color:#FFCD56;
-  border-color: #FFCD56;
-  background-color: rgba(255,205,86,0.1);
+.title:focus {
+  color: #ffcd56;
+  border-color: #ffcd56;
+  background-color: rgba(255, 205, 86, 0.1);
 }
 </style>

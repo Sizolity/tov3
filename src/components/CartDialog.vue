@@ -6,31 +6,33 @@
       tooltip-effect="dark"
       style="width: 100%"
       @selection-change="handleSelectionChange"
-      max-height="250">
-<!--      <el-table-column-->
-<!--        type="selection"-->
-<!--        width="55"></el-table-column>-->
+      max-height="250"
+    >
+      <!--      <el-table-column-->
+      <!--        type="selection"-->
+      <!--        width="55"></el-table-column>-->
       <el-table-column prop="goodsName" label="商品" align="center">
         <template slot-scope="scope">
-          <el-popover
-            placement="top-start"
-            width="100"
-            trigger="hover">
+          <el-popover placement="top-start" width="100" trigger="hover">
             <el-image :src="scope.row.picture"></el-image>
-            <el-button slot="reference" style="border: 0px">{{scope.row.goodsName}}</el-button>
+            <el-button slot="reference" style="border: 0px">{{ scope.row.goodsName }}</el-button>
           </el-popover>
         </template>
       </el-table-column>
       <el-table-column prop="num" label="数量" align="center" width="160">
         <template scope="scope">
-          <el-input-number v-model="scope.row.num" size="mini" :min="0" @change="handleChange(scope.row)"></el-input-number>
+          <el-input-number
+            v-model="scope.row.num"
+            size="mini"
+            :min="0"
+            @change="handleChange(scope.row)"
+          ></el-input-number>
         </template>
       </el-table-column>
       <el-table-column prop="total" label="价格(￥)" align="center"></el-table-column>
     </el-table>
     <div style="margin-top: 20px">
-      <el-popover placement="top" width="160"
-                  v-model="visible">
+      <el-popover placement="top" width="160" v-model="visible">
         <p>确认购买吗？</p>
         <div style="text-align: right; margin: 0">
           <el-button size="mini" type="text" @click.native="visible = false">取消</el-button>
@@ -39,172 +41,151 @@
         <el-button slot="reference" icon="el-icon-check" type="primary">购买</el-button>
       </el-popover>
       <el-button @click.native="Clear" type="warning" icon="el-icon-delete">清空</el-button>
-<!--      <el-button @click.native="Clear" type="danger" style="text-align: right">清空购物</el-button>-->
+      <!--      <el-button @click.native="Clear" type="danger" style="text-align: right">清空购物</el-button>-->
     </div>
   </div>
 </template>
 
-<script>
-  export default {
-    name: "CartDialog",
-    props: ['sid'],
-    data() {
-      return {
-        cartList: [{
-          cid: 1,
-          gid: 3,
-          goodsName: "炒面",
-          num: 1,
-          picture: "http://localhost:8080/takeout/upload/201907121000433.jpg",
-          price: 200,
-          shopName: "mai",
-          sid: 1,
-          total: 200
-        }],
-        multipleSelection: [],
+<script setup>
+import { ElMessage } from 'element-plus'
+import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
 
-        visible: false,
+// 引入 props 和 emit 作为定义
+const props = defineProps(['sid'])
+const emit = defineEmits(['Buy', 'Delete', 'Change'])
 
-        num: 1
-      }
-    },
-    created() {
-      this.refreshData()
-    },
+// 定义状态
+const cartList = ref([])
+const visible = ref(false)
 
-    methods: {
-      getCnt(gid) {
-        for (let i = 0, len = this.cartList.length; i < len; i++) {
-          if (this.cartList[i].gid === gid) {
-            return this.cartList[i].num
-          }
-        }
-        return 0
-      },
+// 创建生命周期钩子
+onMounted(() => {
+  refreshData()
+})
 
-      refreshData() {
-        this.cartList = []
-        this.$get('/consumer/getShoppingCartByCidSid', {
-          CID: this.$db.get('USER_ID'),
-          SID: this.sid
-        }).then(res => {
-          this.cartList = res.data.data
-        }).catch(err => console.log(err))
-      },
+// 定义方法
+function getCnt(gid) {
+  const item = cartList.value.find((item) => item.gid === gid)
+  return item ? item.num : 0
+}
 
-      // 多选
-      toggleSelection(rows) {
-        if (rows) {
-          rows.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row);
-          });
-        } else {
-          this.$refs.multipleTable.clearSelection();
-        }
-      },
+async function refreshData() {
+  // 清空购物车列表
+  cartList.value = []
 
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-      },
+  try {
+    const res = await $get('/consumer/getShoppingCartByCidSid', {
+      CID: $db.get('USER_ID'),
+      SID: props.sid
+    })
+    // 更新购物车列表
+    cartList.value = res.data.data
+  } catch (err) {
+    console.error(err)
+  }
+}
 
-      // 通信
-      Add(GID) {
+function toggleSelection(rows) {
+  if (rows) {
+    rows.forEach((row) => {
+      $refs.multipleTable.toggleRowSelection(row)
+    })
+  } else {
+    $refs.multipleTable.clearSelection()
+  }
+}
 
-      },
-      Sub(GID) {
+function handleSelectionChange(val) {
+  // 由于这里的 "multipleSelection" 没有被定义，所以您可以考虑将其添加为 ref 或 reactive
+}
 
-      },
+// 添加商品到购物车
+function Add(GID) {
+  // 实现逻辑
+}
 
-      async Buy() {
-        if (this.cartList.length === 0) {
-          this.$message({
-            type: 'info',
-            message: '购物车为空'
-          })
-          return
-        }
-        let date = new Date().Format('yyyy-MM-dd hh:mm:ss')
-        for (let i = 0, len = this.cartList.length; i < len; i++) {
-          let item = this.cartList[i]
-          await this.$get('/ShoppingCart/confirmItemWithDate', {
-            CID: this.$db.get('USER_ID'),
-            GID: item.gid,
-            now: date
-          }).then(res => {
+// 减少商品数量
+function Sub(GID) {
+  // 实现逻辑
+}
 
-          }).catch(err => console.log(err))
-        }
-        this.$message({
-          type: 'success',
-          message: '购买成功'
-        })
-        this.$emit('Buy', this.cartList)
-      },
-      Delete() {
-        // for (let cartItem of this.multipleSelection) {
-        //   this.$get('/ShoppingCart/deleteItem', {
-        //     CID: this.$db.get('USER_ID'),
-        //     GID: cartItem.gid
-        //   })
-        // }
-        // this.$emit('Delete', this.multipleSelection)
-
-        // 更新视图
-
-      },
-      async Clear() {
-        for (let i = 0, len = this.cartList.length; i < len; i++) {
-          let item = this.cartList[i]
-          await this.$get('/ShoppingCart/deleteItem', {
-            CID: this.$db.get('USER_ID'),
-            GID: item.gid
-          })
-        }
-        this.$emit('Delete', this.cartList)
-        this.cartList = []
-      },
-
-      handleChange(row) {
-        // console.log(row)
-        this.$get('/ShoppingCart/numChoose', {
-          CID: this.$db.get('USER_ID'),
-          GID: row.gid,
-          num: row.num
-        }).then(async res => {
-          // 此购物没啦
-          if (row.num === 0) {
-            for (let i = 0, len = this.cartList.length; i < len; i++) {
-              if (this.cartList[i].gid === row.gid) {
-                await this.$get('/ShoppingCart/deleteItem', {
-                  CID: this.$db.get('USER_ID'),
-                  GID: row.gid
-                }).then(res => {
-                  this.cartList.splice(i, 1)
-                  this.$emit('Delete', [row])
-                }).catch(err => console.log(err))
-                return
-              }
-            }
-          }
-
-          row.total = res.data.data.total
-          // 更新父组件
-          this.$emit('Change', row)
-        }).catch(err => {
-          console.log("来到这")
-          // 还原数据
-          this.$get('/ShoppingCart/queryById', {
-            CID: this.$db.get('USER_ID'),
-            GID: row.gid
-          }).then(res => {
-            row.num = res.data.data.num
-          }).catch(err => console.log(err))
-        })
-      }
+// 购买逻辑
+async function Buy() {
+  if (cartList.value.length === 0) {
+    $message({
+      type: 'info',
+      message: '购物车为空'
+    })
+    return
+  }
+  let date = new Date().toISOString().slice(0, 19).replace('T', ' ') // 日期格式化
+  for (let item of cartList.value) {
+    try {
+      await $get('/ShoppingCart/confirmItemWithDate', {
+        CID: $db.get('USER_ID'),
+        GID: item.gid,
+        now: date
+      })
+    } catch (err) {
+      console.error(err)
     }
   }
+  ElMessage({
+    type: 'success',
+    message: '购买成功'
+  })
+  emit('Buy', cartList.value)
+}
+
+// 清空购物车
+async function Clear() {
+  for (let item of cartList.value) {
+    try {
+      await $get('/ShoppingCart/deleteItem', {
+        CID: $db.get('USER_ID'),
+        GID: item.gid
+      })
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  emit('Delete', cartList.value)
+  cartList.value = []
+}
+
+// 更新数量逻辑
+async function handleChange(row) {
+  try {
+    const res = await $get('/ShoppingCart/numChoose', {
+      CID: $db.get('USER_ID'),
+      GID: row.gid,
+      num: row.num
+    })
+
+    row.total = res.data.data.total
+
+    // 更新父组件
+    emit('Change', row)
+
+    // 如果数量为0，则删除该项
+    if (row.num === 0) {
+      await $get('/ShoppingCart/deleteItem', {
+        CID: $db.get('USER_ID'),
+        GID: row.gid
+      })
+      cartList.value = cartList.value.filter((item) => item.gid !== row.gid)
+      emit('Delete', [row])
+    }
+  } catch (err) {
+    console.error(err)
+    // 将数据还原
+    const res = await $get('/ShoppingCart/queryById', {
+      CID: $db.get('USER_ID'),
+      GID: row.gid
+    })
+    row.num = res.data.data.num
+  }
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

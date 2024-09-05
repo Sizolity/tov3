@@ -40,109 +40,208 @@
   </el-row>
 </template>
 
-<script>
+<script setup>
 // import {Notification} from "element-ui"
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { inject, onMounted, ref } from 'vue'
 
-export default {
-  name: 'Setting',
-  data() {
-    return {
-      oldData: {},
-      ruleForm: {
-        name: '',
-        options: [
-          {
-            value: '1',
-            label: '男'
-          },
-          {
-            value: '2',
-            label: '女'
-          }
-        ],
-        age: '',
-        telephone: '',
-        email: '',
-        address: ''
-      },
-      rules: {
-        name: [
-          { required: true, message: '请输入名字', trigger: 'blur' },
-          { min: 1, max: 25, message: '长度在 1 到 25 个字符', trigger: 'blur' }
-        ],
-        telephone: [{ min: 11, max: 11, message: '长度在必须为 11 位', trigger: 'blur' }]
-      }
+const $db = inject('$db')
+
+const oldData = ref({})
+const ruleForm = ref({
+  name: '',
+  options: [
+    {
+      value: '1',
+      label: '男'
+    },
+    {
+      value: '2',
+      label: '女'
     }
-  },
-  created() {
-    this.oldData = JSON.parse(this.$db.get('USER_INFO'))
-    this.dataReset()
-  },
-  methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          // 先询问是否修改
-          this.$confirm('是否确认修改个人信息?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
+  ],
+  age: '',
+  telephone: '',
+  email: '',
+  address: ''
+})
+const rules = ref({
+  name: [
+    { required: true, message: '请输入名字', trigger: 'blur' },
+    { min: 1, max: 25, message: '长度在 1 到 25 个字符', trigger: 'blur' }
+  ],
+  telephone: [{ min: 11, max: 11, message: '长度在必须为 11 位', trigger: 'blur' }]
+})
+
+onMounted(() => {
+  oldData.value = ruleForm.value
+  dataReset()
+})
+
+const submitForm = (formName) => {
+  this.$refs[formName].validate((valid) => {
+    if (valid) {
+      // 先询问是否修改
+      ElMessageBox.confirm('是否确认修改个人信息?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          $get('/consumer/editInfo', {
+            CID: $db.get('USER_ID'),
+            name: ruleForm.value.name,
+            sex: ruleForm.value.sex,
+            age: ruleForm.value.age,
+            telephone: ruleForm.value.telephone,
+            email: ruleForm.value.email,
+            address: ruleForm.value.address
           })
-            .then(() => {
-              this.$get('/consumer/editInfo', {
-                CID: this.$db.get('USER_ID'),
-                name: this.ruleForm.name,
-                sex: this.ruleForm.sex,
-                age: this.ruleForm.age,
-                telephone: this.ruleForm.telephone,
-                email: this.ruleForm.email,
-                address: this.ruleForm.address
-              })
-                .then((res) => {
-                  this.$db.save('USER_INFO', res.data.data)
-                  this.oldData = JSON.parse(this.$db.get('USER_INFO'))
-                  this.dataReset()
-                  // 修改成功
-                  this.$message({
-                    type: 'success',
-                    message: '修改成功!',
-                    center: true
-                  })
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
-            })
-            .catch(() => {
-              this.$message({
-                type: 'info',
-                message: '已取消更改',
+            .then((res) => {
+              $db.save('USER_INFO', res.data.data)
+              oldData = JSON.parse(this.$db.get('USER_INFO'))
+              dataReset()
+              // 修改成功
+              ElMessage({
+                type: 'success',
+                message: '修改成功!',
                 center: true
               })
-              this.dataReset()
             })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields()
-      this.dataReset()
-    },
-    dataReset() {
-      this.ruleForm = {
-        name: this.oldData.username,
-        sex: this.oldData.sex,
-        age: this.oldData.age,
-        telephone: this.oldData.telephone,
-        email: this.oldData.email,
-        address: this.oldData.address
-      }
+            .catch((err) => {
+              console.log(err)
+            })
+        })
+        .catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '已取消更改',
+            center: true
+          })
+          this.dataReset()
+        })
+    } else {
+      console.log('error submit!!')
+      return false
     }
+  })
+}
+
+const resetForm = (formName) => {
+  this.$refs[formName].resetFields()
+  dataReset()
+}
+
+const dataReset = () => {
+  ruleForm = {
+    name: this.oldData.username,
+    sex: this.oldData.sex,
+    age: this.oldData.age,
+    telephone: this.oldData.telephone,
+    email: this.oldData.email,
+    address: this.oldData.address
   }
 }
+// export default {
+//   name: 'Setting',
+//   data() {
+//     return {
+//       oldData: {},
+//       ruleForm: {
+//         name: '',
+//         options: [
+//           {
+//             value: '1',
+//             label: '男'
+//           },
+//           {
+//             value: '2',
+//             label: '女'
+//           }
+//         ],
+//         age: '',
+//         telephone: '',
+//         email: '',
+//         address: ''
+//       },
+//       rules: {
+//         name: [
+//           { required: true, message: '请输入名字', trigger: 'blur' },
+//           { min: 1, max: 25, message: '长度在 1 到 25 个字符', trigger: 'blur' }
+//         ],
+//         telephone: [{ min: 11, max: 11, message: '长度在必须为 11 位', trigger: 'blur' }]
+//       }
+//     }
+//   },
+//   created() {
+//     this.oldData = JSON.parse(this.$db.get('USER_INFO'))
+//     this.dataReset()
+//   },
+//   methods: {
+//     submitForm(formName) {
+//       this.$refs[formName].validate((valid) => {
+//         if (valid) {
+//           // 先询问是否修改
+//           this.$confirm('是否确认修改个人信息?', '提示', {
+//             confirmButtonText: '确定',
+//             cancelButtonText: '取消',
+//             type: 'warning'
+//           })
+//             .then(() => {
+//               this.$get('/consumer/editInfo', {
+//                 CID: this.$db.get('USER_ID'),
+//                 name: this.ruleForm.name,
+//                 sex: this.ruleForm.sex,
+//                 age: this.ruleForm.age,
+//                 telephone: this.ruleForm.telephone,
+//                 email: this.ruleForm.email,
+//                 address: this.ruleForm.address
+//               })
+//                 .then((res) => {
+//                   this.$db.save('USER_INFO', res.data.data)
+//                   this.oldData = JSON.parse(this.$db.get('USER_INFO'))
+//                   this.dataReset()
+//                   // 修改成功
+//                   this.$message({
+//                     type: 'success',
+//                     message: '修改成功!',
+//                     center: true
+//                   })
+//                 })
+//                 .catch((err) => {
+//                   console.log(err)
+//                 })
+//             })
+//             .catch(() => {
+//               this.$message({
+//                 type: 'info',
+//                 message: '已取消更改',
+//                 center: true
+//               })
+//               this.dataReset()
+//             })
+//         } else {
+//           console.log('error submit!!')
+//           return false
+//         }
+//       })
+//     },
+//     resetForm(formName) {
+//       this.$refs[formName].resetFields()
+//       this.dataReset()
+//     },
+//     dataReset() {
+//       this.ruleForm = {
+//         name: this.oldData.username,
+//         sex: this.oldData.sex,
+//         age: this.oldData.age,
+//         telephone: this.oldData.telephone,
+//         email: this.oldData.email,
+//         address: this.oldData.address
+//       }
+//     }
+//   }
+// }
 </script>
 
 <style scoped>
