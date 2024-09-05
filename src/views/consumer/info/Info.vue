@@ -76,7 +76,7 @@ import { inject, onMounted, ref } from 'vue'
 const $db = inject('$db')
 const $get = inject('$get')
 
-const user = ref({
+let user = ref({
   username: '',
   sex: '',
   age: '',

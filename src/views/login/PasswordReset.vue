@@ -71,17 +71,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useAccountStore } from '../../stores/account' // Adjust path as needed
+import { ref, inject } from 'vue'
+import { useAccountStore } from '../../stores/updateAccount' // Adjust path as needed
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import jwtDecode from 'jwt-decode'
-import { syspost } from '@/utils/request'
+import { jwtDecode } from 'jwt-decode'
 
-// proxy代理
-const proxy = getCurrentInstance()
-// const syspost = syspost
-//
+// 注入顶层变量
+const $syspost = inject('$syspost')
+
 const router = useRoute()
 
 const store = useAccountStore()
@@ -118,7 +116,7 @@ function sendCode() {
     ElMessage({ message: '请输入正确的手机号', type: 'error', center: true })
   } else {
     // 发送短信验证码
-    syspost('/sms/smsXxs', { phone: form.value.phone })
+    $syspost('/sms/smsXxs', { phone: form.value.phone })
       .then((res) => {
         if (res.data.isOk === 'OK') {
           ElMessage({ message: '发送成功，请注意接收', type: 'success', center: true })
@@ -190,7 +188,7 @@ function changeFinish() {
       ? '/consumer/changePasswordByPhoneCode'
       : '/shop/changePasswordByPhoneCode'
 
-  syspost(url, {
+  $syspost(url, {
     telephone: form.value.phone,
     password: dialogForm.value.pass
   })
@@ -227,7 +225,7 @@ function doLogin() {
   const url =
     route.params.role === 'consumer' ? '/consumer/loginWithoutPass' : '/shop/loginWithoutPass'
 
-  syspost(url, {
+  $syspost(url, {
     telephone: form.value.phone
   })
     .then((r) => {

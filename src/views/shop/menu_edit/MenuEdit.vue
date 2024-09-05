@@ -144,6 +144,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import UploadPicture from '@/components/UploadPicture.vue'
+import { ElMessage } from 'element-plus'
 
 // 获取当前实例
 const { proxy } = getCurrentInstance()
@@ -208,10 +209,10 @@ const handleDelete = async (index, row) => {
     await this.$post('/shop/deleteGoodsByGid', {
       GID: row.id
     })
-    this.$message({ type: 'info', message: '删除成功' })
+    ElMessage({ type: 'info', message: '删除成功' })
     goodsList.value = goodsList.value.filter((x) => x.id !== row.id)
   } catch {
-    this.$message({ type: 'info', message: '已取消删除' })
+    ElMessage({ type: 'info', message: '已取消删除' })
   }
 }
 
@@ -231,7 +232,7 @@ const submitChange = async () => {
         url: form.value.url
       })
       goodsList.value.push(res.data.data)
-      this.$message({ type: 'info', message: '已添加商品' })
+      ElMessage({ type: 'info', message: '已添加商品' })
     } else {
       // 修改商品
       const res = await this.$post('/shop/updateGoods', {
@@ -244,10 +245,10 @@ const submitChange = async () => {
         url: form.value.url
       })
       goodsList.value[nowEditIndex.value] = res.data.data
-      this.$message({ type: 'info', message: '修改成功' })
+      ElMessage({ type: 'info', message: '修改成功' })
     }
   } catch (err) {
-    this.$message({ type: 'error', message: '操作失败，请联系管理员' })
+    ElMessage({ type: 'error', message: '操作失败，请联系管理员' })
   }
 }
 

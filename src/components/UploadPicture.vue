@@ -45,7 +45,7 @@ watch(
 function handleSuccess(res, file) {
   emit('getUrl', res.data)
   dialogImageUrl.value = res.data
-  this.$message({
+  ElMessage({
     type: 'info',
     message: '图片上传成功',
     duration: 6000
@@ -72,7 +72,7 @@ function handlePreview(file) {
 
 // 上传的文件个数超出设定时触发的函数
 function onExceed(files, fileList) {
-  this.$message({
+  ElMessage({
     type: 'info',
     message: '最多只能上传一个图片',
     duration: 6000
@@ -88,10 +88,10 @@ function beforeUpload(file) {
   const isLt2M = file.size / 1024 / 1024 < 2
 
   if (!isJPG && !isGIF && !isPNG && !isBMP) {
-    this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+    ElMessage.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
   }
   if (!isLt2M) {
-    this.$message.error('上传图片大小不能超过 2MB!')
+    ElMessage.error('上传图片大小不能超过 2MB!')
   }
   return (isJPG || isBMP || isGIF || isPNG) && isLt2M
 }

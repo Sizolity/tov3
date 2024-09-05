@@ -1,10 +1,9 @@
 import axios from 'axios'
 import db from './localstorage'
-import { ElDialog, ElNotification, ElMessageBox, ElMessage } from 'element-plus'
-import useAuthStore from '../stores/account'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { useAuthStore } from '../stores/account'
 import moment from 'moment'
 moment.locale('zh-cn')
-useStore = useAuthStore()
 
 // 统一配置
 let REQUEST = axios.create({
@@ -25,7 +24,8 @@ let SYS_REQUEST = axios.create({
     return status === 200
   }
 })
-///////////////////
+
+useStore = useAuthStore()
 
 REQUEST.interceptors.request.use(
   (config) => {

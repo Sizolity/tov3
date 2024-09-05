@@ -113,10 +113,10 @@ const shop = ref({
   username: 1
 })
 
-onMounted = () => {
+onMounted(() => {
   SID.value = this.$route.params.SID
   refreshPage()
-}
+})
 
 //todo
 watch(

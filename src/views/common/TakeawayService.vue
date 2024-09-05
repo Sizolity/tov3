@@ -6,8 +6,8 @@
 
 <script setup>
 import { inject } from 'vue'
-import consumerHomePage from '../consumer/ConsumerHomePage.vue'
-import shopHomePage from '../shop/ShopHomePage.vue'
+import consumerHomePage from '/src/views/consumer/ConsumerHomePage.vue'
+import shopHomePage from '/src/views/shop/ShopHomePage.vue'
 
 const $db = inject('$db')
 const componentName = computed(() => {

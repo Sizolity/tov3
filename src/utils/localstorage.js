@@ -1,4 +1,4 @@
-let db = {
+const db = {
   save(key, value) {
     localStorage.setItem(key, JSON.stringify(value))
   },
@@ -10,7 +10,7 @@ let db = {
   },
   clear() {
     localStorage.clear()
-  },
+  }
 }
 
 export default db

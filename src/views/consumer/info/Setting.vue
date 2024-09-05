@@ -47,8 +47,8 @@ import { inject, onMounted, ref } from 'vue'
 
 const $db = inject('$db')
 
-const oldData = ref({})
-const ruleForm = ref({
+let oldData = ref({})
+let ruleForm = ref({
   name: '',
   options: [
     {
@@ -134,12 +134,12 @@ const resetForm = (formName) => {
 
 const dataReset = () => {
   ruleForm = {
-    name: this.oldData.username,
-    sex: this.oldData.sex,
-    age: this.oldData.age,
-    telephone: this.oldData.telephone,
-    email: this.oldData.email,
-    address: this.oldData.address
+    name: oldData.username,
+    sex: oldData.sex,
+    age: oldData.age,
+    telephone: oldData.telephone,
+    email: oldData.email,
+    address: oldData.address
   }
 }
 // export default {

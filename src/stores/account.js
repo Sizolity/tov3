@@ -45,50 +45,54 @@ import db from '../utils/localstorage'
 
 import { defineStore } from 'pinia'
 
-export const useAuthStore = defineStore('account', {
-  state: () => ({
-    token: null,
-    expireTime: null,
-    user: null,
-    permissions: null,
-    roles: null,
-    id: null,
-    info: null
-  }),
-  getters: {
-    // 在这里定义派生状态
-  },
-  actions: {
-    // 在这里定义异步操作
-    setToken(state, val) {
-      db.save('USER_TOKEN', val)
-      state.token = val
+export const useAuthStore = defineStore(
+  'account',
+  {
+    state: () => ({
+      token: null,
+      expireTime: null,
+      user: null,
+      permissions: null,
+      roles: null,
+      id: null,
+      info: null
+    }),
+    getters: {
+      // 在这里定义派生状态
     },
-    setExpireTime(state, val) {
-      db.save('EXPIRE_TIME', val)
-      state.expireTime = val
-    },
-    setUser(state, val) {
-      db.save('USER', val)
-      state.user = val
-    },
-    setPermissions(state, val) {
-      db.save('PERMISSIONS', val)
-      state.permissions = val
-    },
-    setRoles(state, val) {
-      db.save('ROLES', val)
-      state.roles = val
-    },
-    setId(state, val) {
-      db.save('USER_ID', val)
-      state.id = val
-    },
-    setInfo(state, val) {
-      db.save('USER_INFO', val)
-      state.info = val
+    actions: {
+      // 在这里定义异步操作
+      setToken(state, val) {
+        db.save('USER_TOKEN', val)
+        state.token = val
+      },
+      setExpireTime(state, val) {
+        db.save('EXPIRE_TIME', val)
+        state.expireTime = val
+      },
+      setUser(state, val) {
+        db.save('USER', val)
+        state.user = val
+      },
+      setPermissions(state, val) {
+        db.save('PERMISSIONS', val)
+        state.permissions = val
+      },
+      setRoles(state, val) {
+        db.save('ROLES', val)
+        state.roles = val
+      },
+      setId(state, val) {
+        db.save('USER_ID', val)
+        state.id = val
+      },
+      setInfo(state, val) {
+        db.save('USER_INFO', val)
+        state.info = val
+      }
     }
-  }
-})
+  },
+  { persist: true }
+)
 
 export default useAuthStore

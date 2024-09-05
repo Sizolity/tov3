@@ -85,27 +85,121 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useCommentsStore } from '../utils/'
+import { ref, computed, inject } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import util from '/src/utils/util'
 
-const commentsStore = useCommentsStore()
-const comments = computed(() => commentsStore.comments)
+//global
+const $get = inject('$get')
+const $db = inject('$db')
+
+// const comments = computed(() => commentsStore.comments)
 const inputComment = ref('')
 const showItemId = ref('')
 const replyIndex = ref('')
 
-const likeComment = (item) => {
-  commentsStore.likeComment(item)
-}
+// const likeComment = (item) => {
+//   commentsStore.likeComment(item)
+// }
 
 const commitComment = async (showItemId_, inputComment_, replyIndex_) => {
-  await commentsStore.commitComment(showItemId_, inputComment_, replyIndex_)
-  inputComment.value = '' // 清空输入框
-  showItemId.value = '' // 关闭输入框
+  let date = new Date().Format('yyyy-MM-dd hh:mm:ss')
+
+  let url = ''
+  if ($db.get('ROLES') === '"shop"') {
+    url = '/shopReply/add'
+  } else {
+    url = '/consumerReply/add'
+  }
+
+  $get(url, {
+    uid: this.$db.get('USER_ID'),
+    coid: this.showItemId,
+    cotime: date,
+    content: this.inputComment
+  })
+    .then((res) => {
+      // 更新父组件视图
+      this.$emit('add', replyIndex, {
+        id: String(showItemId) + String($db.get('USER_ID')), //主键id, 感觉没卵用
+        commentId: comments[replyIndex].id, //父评论id，即父亲的id
+        fromId: $db.get('USER_ID'), //评论者id
+        fromName:
+          util.userString(this.$db.get('USER')) +
+          (this.$db.get('ROLES') === '"shop"' ? '(商家)' : ''), //评论者昵称
+        fromAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg', //评论者头像
+        toId: this.comments[this.replyIndex].fromId, //被评论者id
+        toName: this.comments[this.replyIndex].fromName, //被评论者昵称
+        toAvatar: 'http://ww4.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2pddjuj30v90uvagf.jpg', //被评论者头像
+        content: this.inputComment, //评论内容
+        date: date, //评论时间
+        replyRole: util.userString(this.$db.get('ROLES'))
+      })
+      // input框变为空
+      this.inputComment = ''
+      // 收起输入框
+      this.showItemId = ''
+      this.$message({
+        type: 'info',
+        message: '添加成功',
+        center: true
+      })
+    })
+    .catch((err) => {
+      console.log(err)
+      this.$message({
+        type: 'error',
+        message: '添加失败，可能出了点错误',
+        center: true
+      })
+    })
 }
 
 const deleteComment = async (idx, reply) => {
-  await commentsStore.deleteComment(idx, reply)
+  console.log(reply.fromId)
+
+  let url = ''
+  if (this.$db.get('ROLES') === '"shop"') {
+    url = '/shopReply/delete'
+  } else {
+    url = '/consumerReply/delete'
+  }
+  // 开始删掉这条回复
+  ElMessageBox.confirm('是否确认删除此条回复?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => {
+      $get(url, {
+        uid: this.$db.get('USER_ID'),
+        coid: reply.commentId,
+        date: reply.date
+      })
+        .then((res) => {
+          // 更新父组件视图
+          this.$emit('remove', idx, ridx)
+          this.$message({
+            type: 'info',
+            message: '已删除',
+            center: true
+          })
+        })
+        .catch((err) => {
+          ElMessage({
+            type: 'error',
+            message: '出了点问题呢，联系一下管理员吧~',
+            center: true
+          })
+        })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '已取消',
+        center: true
+      })
+    })
 }
 
 const showCommentInput = (idx, item) => {
@@ -121,7 +215,7 @@ const cancel = () => {
 </script>
 
 <style scoped lang="scss">
-@import '../assets/index';
+@import '/src/assets/index.scss';
 
 .container {
   padding: 0 10px;

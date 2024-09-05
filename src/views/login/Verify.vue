@@ -62,7 +62,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/updateAccount'
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()

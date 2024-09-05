@@ -10,13 +10,15 @@ import { createPersistedState } from 'pinia-persistedstate-plugin'
 import request from './utils/request'
 import _global from './utils/global'
 import router from './router'
-import Elementplus, { ElNotification } from 'element-plus'
-
+import Elementplus from 'element-plus'
 import db from './utils/localstorage'
 
-const app = createApp(App)
-const persist = createPersistedState({})
+// import {} from './stores'
+
+const persist = createPersistedState()
 const pinia = createPinia()
+
+const app = createApp(App)
 pinia.use(persist)
 app.use(pinia)
 app.use(router)

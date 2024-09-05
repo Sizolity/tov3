@@ -537,8 +537,8 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import util from '../../utils/util'
-import ContactDialog from '../../components/ContactDialog.vue'
+import util from '/src/utils/util'
+import ContactDialog from '/src/components/ContactDialog.vue'
 
 const title = ref('店铺服务星级评价')
 const radio = ref('全部')

@@ -84,7 +84,7 @@ const $get = inject('$get')
 
 //data
 
-const shopList = ref([
+let shopList = ref([
   {
     managerEmail: '',
     managerName: '',
@@ -97,12 +97,12 @@ const shopList = ref([
     score: 1
   }
 ])
-const dataInPage = ref([])
+let dataInPage = ref([])
 const input = ref('')
 const num = ref(1)
 const radio = ref('全部')
 const tableData = ref([])
-const card = ref([])
+let card = ref([])
 
 onMounted(() => {
   $get('/shop/getAllShopInfo')

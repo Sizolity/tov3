@@ -1,14 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useStore } from 'pinia'
 import LogIn from '@/views/login/LogIn.vue'
 import SignIn from '@/views/login/SignIn.vue'
 import ShoppingTrolley from '@/views/consumer/ShoppingTrolley.vue'
 import SetUp from '@/views/shop/SetUp.vue'
 import Index from '@/views/Index.vue'
 import TakeawayOrder from '@/views/consumer/TakeawayOrder.vue'
-import db from '../utils/localstorage'
-import request from '../utils/request'
-import App from '@/App.vue'
+import db from '@/utils/localstorage'
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -29,10 +26,10 @@ import Contact from '@/views/consumer/info/Contact.vue'
 import ConsumerSignIn from '@/views/login/ConsumerSignIn.vue'
 import ShopSignIn from '@/views/login/ShopSignIn.vue'
 import Verify from '@/views/login/Verify.vue'
-import { Message, MessageBox } from 'element-plus'
 import ShopDetail from '@/views/consumer/shop_view/ShopDetail.vue'
 import OrderManager from '@/views/shop/service/OrderManager.vue'
 import PasswordReset from '@/views/login/PasswordReset.vue'
+import { ElMessage } from 'element-plus'
 
 // nprogress样式文件
 NProgress.configure({
@@ -47,7 +44,7 @@ NProgress.configure({
 const routes = [
   {
     path: '/',
-    redirect: '/index'
+    component: Index
   },
   {
     path: '/index',
@@ -187,32 +184,32 @@ const router = createRouter({
   routes: routes
 })
 
-router.beforeEach((to, from, next) => {
-  // 开启进度条
-  NProgress.start()
-  if (whiteList.indexOf(to.path) !== -1) {
-    next()
-  } else {
-    let token = db.get('USER_TOKEN')
-    let user = db.get('USER')
-    if (token.length && user) {
-      next()
-    } else {
-      Message.info('请先登录')
-      // 本来就是登录界面，就不用更改
-      if (from.path === '/login') {
-        // 先结束路由进度
-        NProgress.done()
-        return
-      }
-      next('/login')
-    }
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   // 开启进度条
+//   NProgress.start()
+//   if (whiteList.indexOf(to.path) !== -1) {
+//     next()
+//   } else {
+//     let token = db.get('USER_TOKEN')
+//     let user = db.get('USER')
+//     if (token.length && user) {
+//       next()
+//     } else {
+//       ElMessage.info('请先登录')
+//       // 本来就是登录界面，就不用更改
+//       if (from.path === '/login') {
+//         // 先结束路由进度
+//         NProgress.done()
+//         return
+//       }
+//       next('/login')
+//     }
+//   }
+// })
 
-router.afterEach(() => {
-  // 关闭进度条
-  NProgress.done()
-})
+// router.afterEach(() => {
+//   // 关闭进度条
+//   NProgress.done()
+// })
 
 export default router
