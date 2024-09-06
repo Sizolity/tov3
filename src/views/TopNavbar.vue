@@ -4,11 +4,11 @@
       <el-col :span="2" class="logo"></el-col>
       <el-col :span="2"><div class="grid-content">首页</div></el-col>
       <!--      左侧-->
-      <template v-if="userRole.value === 'consumer'">
+      <template v-if="userRole.valueOf === 'consumer'">
         <el-col :span="2"><div class="grid-content">外卖服务</div></el-col>
         <el-col :span="2"><div class="grid-content">订单管理</div></el-col>
       </template>
-      <template v-else-if="userRole.value === 'shop'">
+      <template v-else-if="userRole.valueOf === 'shop'">
         <el-col :span="2"><div class="grid-content">菜单管理</div></el-col>
         <el-col :span="2"><div class="grid-content">评论管理</div></el-col>
         <el-col :span="2"><div class="grid-content">订单管理</div></el-col>
@@ -19,7 +19,7 @@
       <!--      空白-->
       <el-col :span="emptySpan()"></el-col>
       <!--      右侧， 分别为用户和商家 和 不登录状态-->
-      <template v-if="userRole.value === 'consumer'">
+      <template v-if="userRole.valueOf === 'consumer'">
         <el-col :span="2">
           <el-dropdown>
             <span class="el-dropdown-link">
@@ -49,7 +49,7 @@
           </el-dropdown>
         </el-col>
       </template>
-      <template v-else-if="userRole.value === 'shop'">
+      <template v-else-if="userRole.valueOf === 'shop'">
         <el-col :span="2">
           <el-dropdown>
             <span class="el-dropdown-link">
@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, getCurrentInstance } from 'vue'
+import { ref, onMounted, onUnmounted, computed, getCurrentInstance, inject } from 'vue'
 
 // 获取当前实例
 // const { proxy } = getCurrentInstance()
@@ -102,7 +102,7 @@ const offsetTop = ref(0)
 
 //db解析
 const instance = getCurrentInstance()
-const db = instance.appContext.config.globalProperties.$db
+const db = inject('$db')
 
 // 设置bar浮动阈值为 #fixedBar 至页面顶部的距离
 const setOffsetTop = () => {

@@ -25,11 +25,11 @@ let SYS_REQUEST = axios.create({
   }
 })
 
-useStore = useAuthStore()
-
 REQUEST.interceptors.request.use(
   (config) => {
-    let expireTime = useStore.state.account.expireTime
+    const useStore = useAuthStore()
+
+    let expireTime = useStore.$state.account.expireTime
     let now = new Date().valueOf()
     // 让token早10秒种过期，提升“请重新登录”弹窗体验
     if (now - expireTime >= -10 * 1000) {
@@ -44,8 +44,8 @@ REQUEST.interceptors.request.use(
       })
     }
     // 有 token就带上
-    if (useStore.state.account.token) {
-      config.headers.Authentication = useStore.state.account.token
+    if (useStore.$state.account.token) {
+      config.headers.Authentication = useStore.$state.account.token
     }
     return config
   },

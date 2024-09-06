@@ -9,7 +9,7 @@ import { createPersistedState } from 'pinia-persistedstate-plugin'
 
 import request from './utils/request'
 import _global from './utils/global'
-import router from './router'
+import router from '@/router'
 import Elementplus from 'element-plus'
 import db from './utils/localstorage'
 

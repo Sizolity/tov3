@@ -19,6 +19,7 @@ const myBackToTopStyle = ref({
   <!--  <el-container>-->
   <div id="app">
     <topNavbar></topNavbar>
+    <router-view></router-view>
     <!-- <router-view></router-view> -->
     <!--可自定义按钮的样式、show/hide临界点、返回的位置  -->
     <!--如需文字提示，可在外部添加element的<el-tooltip></el-tooltip>元素  -->
