@@ -45,12 +45,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ElNotification } from 'element-plus'
-import { useRouter } from 'vue-router'
+import { inject, ref } from 'vue'
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $post = inject('$post')
+const $db = inject('$db')
 
 // 响应式表单数据
 const ruleForm = ref({
@@ -92,8 +91,8 @@ const submitForm = async (formName) => {
   const valid = await validateForm(formName)
   if (valid) {
     try {
-      const res = await proxy.$post('/shop/changePassword', {
-        SID: proxy.$db.get('USER_ID'),
+      const res = await $post('/shop/changePassword', {
+        SID: $db.get('USER_ID'),
         oldPassword: ruleForm.value.oldPass,
         newPassword: ruleForm.value.pass
       })
@@ -114,13 +113,13 @@ const submitForm = async (formName) => {
 
 // 重置表单
 const resetForm = (formName) => {
-  proxy.$refs[formName].resetFields()
+  formName.resetFields()
 }
 
 // 验证表单
 const validateForm = (formName) => {
   return new Promise((resolve) => {
-    proxy.$refs[formName].validate((valid) => {
+    formName.validate((valid) => {
       resolve(valid)
     })
   })

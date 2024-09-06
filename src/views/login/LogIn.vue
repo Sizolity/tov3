@@ -10,8 +10,8 @@
     <el-row class="t">?</el-row>
     <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
       <el-radio-group v-model="radio" class="text">
-        <el-radio :label="1">用户</el-radio>
-        <el-radio :label="2">商家</el-radio>
+        <el-radio value="1">用户</el-radio>
+        <el-radio value="2">商家</el-radio>
       </el-radio-group>
 
       <el-form-item label="用户名" prop="username" class="form-item">
@@ -34,12 +34,12 @@
       </el-form-item>
 
       <el-row>
-        <div class="code" @click="$router.push('/verify')">>>>手机验证码登录>>></div>
+        <div class="code" @click="router.push('/verify')">>>>手机验证码登录>>></div>
       </el-row>
 
       <el-row>
         <el-button type="warning" class="login-btn" @click="onSubmit('loginForm')">登 录</el-button>
-        <el-button class="sign-btn" @click="$router.push('/signin')">注 册</el-button>
+        <el-button class="sign-btn" @click="router.push('/signin')">注 册</el-button>
       </el-row>
 
       <el-row>
@@ -59,16 +59,19 @@
 </template>
 
 <script setup>
-import { getCurrentInstance, ref } from 'vue'
+import { ref, inject } from 'vue'
 import { useSyspostStore } from '../../stores/pwdre'
 import { useAccountStore } from '../../stores/updateAccount'
 
 import { jwtDecode } from 'jwt-decode'
 import { ElNotification } from 'element-plus'
+import { useRouter } from 'vue-router'
 
-const syspostStore = useSyspostStore()
-const accountStore = { useAccountStore }()
+const router = useRouter()
+// const syspostStore = useSyspostStore()
+const accountStore = useAccountStore()
 
+const syspost = inject('$syspost')
 // 响应式数据
 const radio = ref(1)
 const form = ref({
@@ -76,7 +79,7 @@ const form = ref({
   password: ''
 })
 
-const proxy = getCurrentInstance()
+const $db = inject('$db')
 
 // 表单验证规则
 const rules = {
@@ -93,14 +96,13 @@ const onSubmit = (formName) => {
   if (valid) {
     let url = radio.value === 1 ? 'consumer/login' : 'shop/login'
 
-    syspostStore
-      .syspost({
-        url,
-        data: {
-          username: form.value.username,
-          password: form.value.password
-        }
-      })
+    syspost({
+      url,
+      data: {
+        username: form.value.username,
+        password: form.value.password
+      }
+    })
       .then((r) => {
         saveLoginData(r.data)
         // 跳转到首页并重载
@@ -113,7 +115,7 @@ const onSubmit = (formName) => {
           message: '账号或密码错误'
         })
         // 清空用户信息
-        proxy.$db.clear('clearUserData')
+        $db.clear('clearUserData')
       })
   } else {
     dialogVisible.value = true
@@ -143,7 +145,8 @@ const resetPassword = () => {
 // 验证表单
 const validateForm = (formName) => {
   return new Promise((resolve) => {
-    refs[formName].validate((valid) => {
+    // # todo
+    formName.validate((valid) => {
       resolve(valid)
     })
   })

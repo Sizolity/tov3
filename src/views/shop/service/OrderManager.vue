@@ -523,12 +523,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import ContactDialog from '@/components/ContactDialog.vue'
 import util from '@/utils/util'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $db = inject('$db')
+const $get = inject('$get')
 
 const radio = ref('全部')
 const id = ref('')
@@ -564,10 +566,9 @@ const switchValue = ref('0')
 
 // 获取历史订单
 const fetchOrderHistory = () => {
-  proxy
-    .$get('/shop/getOrderHistory', {
-      SID: proxy.$db.get('USER_ID')
-    })
+  $get('/shop/getOrderHistory', {
+    SID: $db.get('USER_ID')
+  })
     .then((res) => {
       orderList.value = res.data.data
       formatData.value = util.filterByTimeAndName(orderList.value, 'time', 'consumerName')
@@ -577,7 +578,7 @@ const fetchOrderHistory = () => {
 
 // 得到所有用户数据
 const fetchConsumers = () => {
-  proxy.$get('/shop/queryAllConsumers').then((res) => {
+  $get('/shop/queryAllConsumers').then((res) => {
     allConsumers.value = res.data.data
     searchConsumerRes.value = allConsumers.value.map((x) => x.cId)
   })
@@ -610,24 +611,23 @@ function searchConsumers() {
 }
 
 function confirmOrder(row) {
-  proxy
-    .$confirm('是否确认接下此订单?', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
+  ElMessageBox.confirm('是否确认接下此订单?', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
     .then(() => {
-      proxy.$get('/shop/confirmOrder', { OID: row.id }).then(() => {
+      $get('/shop/confirmOrder', { OID: row.id }).then(() => {
         const order = orderList.value.find((order) => order.id === row.id)
         if (order) {
           order.state = '待评价'
-          proxy.$message({ type: 'success', message: '已成功接单' })
+          ElMessage({ type: 'success', message: '已成功接单' })
         }
       })
     })
     .catch((err) => {
       console.log(err)
-      proxy.$message({ type: 'info', message: '已取消' })
+      ElMessage({ type: 'info', message: '已取消' })
     })
 }
 

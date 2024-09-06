@@ -64,12 +64,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import util from '@/utils/util'
 import { useRouter } from 'vue-router'
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $get = inject('$get')
+const $db = inject('$db')
 
 // 响应式用户数据
 const user = ref({
@@ -85,8 +86,8 @@ const user = ref({
 // 获取用户信息
 const fetchUserInfo = async () => {
   try {
-    const res = await proxy.$get('/shop/getInfoBySid', {
-      SID: proxy.$db.get('USER_ID')
+    const res = await $get('/shop/getInfoBySid', {
+      SID: $db.get('USER_ID')
     })
     user.value = res.data.data
   } catch (err) {
@@ -96,7 +97,7 @@ const fetchUserInfo = async () => {
 
 // 欢迎信息
 const welcome = () => {
-  return util.welcome(proxy.$db.get('USER'))
+  return util.welcome($db.get('USER'))
 }
 
 // 组件挂载时获取用户信息

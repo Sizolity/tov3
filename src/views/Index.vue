@@ -2,8 +2,8 @@
   <div>
     <div class="background-img">
       <el-row>
-        <el-button type="primary" @click="$router.push('/service')">我要点外卖</el-button>
-        <el-button type="primary" @click="$router.push('/signin/shop')">我要入驻</el-button>
+        <el-button type="primary" @click="onService">我要点外卖</el-button>
+        <el-button type="primary" @click="router.push('/signin/shop')">我要入驻</el-button>
       </el-row>
     </div>
 
@@ -22,7 +22,7 @@
                 class="img-responsive"
                 src="./images/deliver 3.png"
                 alt=""
-                @click="$router.push('/service')"
+                @click="router.push('/service')"
               />
             </div>
           </el-aside>
@@ -30,13 +30,13 @@
             <el-main>
               <div class="title-1">
                 <span class="el-icon">
-                  <i class="el-icon-present" @click="$router.push('/service')"> 美食 Delicacy</i>
+                  <i class="el-icon-present" @click="router.push('/service')"> 美食 Delicacy</i>
                 </span>
                 <div class="subtitle">大牌优惠</div>
               </div>
               <div class="title-2">
                 <span class="el-icon">
-                  <i class="el-icon-ice-cream" @click="$router.push('/service')">
+                  <i class="el-icon-ice-cream" @click="router.push('/service')">
                     甜点饮品 Desserts&Drinks</i
                   >
                 </span>
@@ -44,7 +44,7 @@
               </div>
               <div class="title-3">
                 <span class="el-icon">
-                  <i class="el-icon-grape" @click="$router.push('/service')">
+                  <i class="el-icon-grape" @click="router.push('/service')">
                     水果生鲜 Fresh foods</i
                   >
                 </span>
@@ -52,7 +52,7 @@
               </div>
               <div class="title-4">
                 <span class="el-icon">
-                  <i class="el-icon-shopping-cart-2" @click="$router.push('/service')">
+                  <i class="el-icon-shopping-cart-2" @click="router.push('/service')">
                     超市便利 Supermarket</i
                   >
                 </span>
@@ -131,7 +131,7 @@
 
     <div class="join-container">
       <el-row>
-        <el-button type="primary" class="join-btn" @click="$router.push('/signin')"
+        <el-button type="primary" class="join-btn" @click="router.push('/signin')"
           >加入我们</el-button
         >
       </el-row>
@@ -151,9 +151,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { inject, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const count = ref('Index')
+const router = useRouter()
+const db = inject('$db')
+
+const onService = () => {
+  const roles = db.get('ROLES')
+  if (Object.keys(roles).length === 0) {
+    ElMessage({
+      message: '请先登录'
+    })
+    router.push('/login')
+  } else router.push('/service')
+}
 </script>
 
 <style scoped>

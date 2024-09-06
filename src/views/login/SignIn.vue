@@ -1,9 +1,8 @@
 <template>
   <div class="food-img">
-    <el-button type="primary" v-on:click="shop">商 家 入 驻</el-button>
-    <el-button type="primary" v-on:click="$router.push('/signin/consumer')">用 户 注 册</el-button>
-
-    <el-dialog :visible.sync="dialogVisible" width="60%">
+    <el-button type="primary" v-on:click="dialogVisible = true">商 家 入 驻</el-button>
+    <el-button type="primary" v-on:click="router.push('/signin/consumer')">用 户 注 册</el-button>
+    <el-dialog v-model="dialogVisible" width="60%">
       <p>尊敬的商家：</p>
       <p>
         您好，如果您已经准备完成全部资料，并准备提交申请，在您提交申请前，请务必仔细阅读如下全部声明事项：
@@ -46,7 +45,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElDialog } from 'element-plus'
 
 const checked = ref(false)
 const dialogVisible = ref(false)

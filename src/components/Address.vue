@@ -23,12 +23,10 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance, inject } from 'vue'
 
-// proxy
-const { proxy } = getCurrentInstance()
 const selectedOptions = ref([]) //存放默认地址
-const options = proxy.GLOBAL.options //存放城市数据
+const options = inject('GLOBAL').options //存放城市数据
 const input = ref('')
 const value = ref('')
 

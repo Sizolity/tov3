@@ -71,7 +71,7 @@
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
                 <template slot-scope="scope">
-                  <el-link @click.native="$router.push(`/shop/${scope.row.sid}`)">{{
+                  <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
@@ -190,9 +190,9 @@
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
                 <template slot-scope="scope">
-                  <el-link @click.native="$router.push(`/shop/${scope.row.sid}`)">{{
-                    scope.row.shopName
-                  }}</el-link>
+                  <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">
+                    {{ scope.row.shopName }}
+                  </el-link>
                 </template>
               </el-table-column>
               <el-table-column prop="price" label="订单总价" sortable width="150" align="center">
@@ -285,7 +285,7 @@
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
                 <template slot-scope="scope">
-                  <el-link @click.native="$router.push(`/shop/${scope.row.sid}`)">{{
+                  <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
@@ -376,7 +376,7 @@
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
                 <template slot-scope="scope">
-                  <el-link @click.native="$router.push(`/shop/${scope.row.sid}`)">{{
+                  <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
@@ -471,7 +471,7 @@
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
                 <template slot-scope="scope">
-                  <el-link @click.native="$router.push(`/shop/${scope.row.sid}`)">{{
+                  <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
@@ -539,7 +539,10 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import util from '/src/utils/util'
 import ContactDialog from '/src/components/ContactDialog.vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
+const router = useRouter()
 const title = ref('店铺服务星级评价')
 const radio = ref('全部')
 const id = ref('')
@@ -619,13 +622,13 @@ const cancelOrder = async (row) => {
       for (let order of orderList.value) {
         if (row.id === order.id) {
           order.state = '已取消'
-          $message({ type: 'success', message: '已成功取消该订单' })
+          ElMessage({ type: 'success', message: '已成功取消该订单' })
         }
       }
     })
     .catch((err) => {
       console.log(err)
-      $message({ type: 'info', message: '取消操作' })
+      ElMessage({ type: 'info', message: '取消操作' })
     })
 }
 
@@ -642,10 +645,10 @@ const cancelSomeOrder = async (row) => {
           }
         })
       }
-      $message({ type: 'success', message: '已成功取消该订单' })
+      ElMessage({ type: 'success', message: '已成功取消该订单' })
     })
     .catch(() => {
-      $message({ type: 'info', message: '取消操作' })
+      ElMessage({ type: 'info', message: '取消操作' })
     })
 }
 
@@ -661,7 +664,7 @@ const submitComment = async (row) => {
     commentForm.content = ''
     commentForm.stars = 0
     dialogFormVisible.value = false
-    $message({ type: 'info', message: '评价成功！' })
+    ElMessage({ type: 'info', message: '评价成功！' })
 
     for (let order of row) {
       if (order.state !== '待评价') return

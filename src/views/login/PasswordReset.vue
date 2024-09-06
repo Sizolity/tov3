@@ -79,7 +79,7 @@ import { jwtDecode } from 'jwt-decode'
 
 // 注入顶层变量
 const $syspost = inject('$syspost')
-
+const $db = inject('$db')
 const router = useRoute()
 
 const store = useAccountStore()
@@ -149,7 +149,6 @@ function timer() {
 function onSubmit() {
   const reg = /^((13|14|15|17|18)[0-9]\d{8})$/
   if (form.value.phone === '') {
-    // 替换this.$message
     ElMessage({ message: '手机号不能为空', type: 'error', center: true })
     return
   }
@@ -235,7 +234,7 @@ function doLogin() {
     })
     .catch((err) => {
       ElMessage({ message: '服务器错误啦', type: 'error', center: true })
-      proxy.$db.clear()
+      $db.clear()
     })
 }
 </script>

@@ -52,14 +52,15 @@ const search = ref('')
 const spanArr = ref([])
 let pos = ref(1)
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $get = inject('$get')
+const $db = inject('$db')
 
 // 获取订单历史记录
 const fetchOrderHistory = async () => {
   try {
-    const res = await proxy.$get('/shop/getOrderHistory', {
-      SID: proxy.$db.get('USER_ID')
+    const res = await $get('/shop/getOrderHistory', {
+      SID: $db.get('USER_ID')
     })
     historyList.value = res.data.data
     getSpanArr(res.data.data)

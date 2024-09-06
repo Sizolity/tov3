@@ -1,16 +1,16 @@
 <template>
   <div>
-    <!--    <el-row>-->
-    <!--      <userAddress></userAddress>-->
-    <!--    </el-row>-->
+    <!-- <el-row> -->
+    <!-- <userAddress></userAddress> -->
+    <!-- </el-row> -->
     <el-row>
       <div>
         <!--        顶部工具-->
         <el-radio-group v-model="radio" fill="#FFCD56">
-          <!--          <el-radio-button label="全部" class="radio"></el-radio-button>-->
-          <!--          <el-radio-button label="主食"></el-radio-button>-->
-          <!--          <el-radio-button label="小吃"></el-radio-button>-->
-          <!--          <el-radio-button label="饮料"></el-radio-button>-->
+          <el-radio-button value="全部" class="radio"></el-radio-button>
+          <el-radio-button value="主食"></el-radio-button>
+          <el-radio-button value="小吃"></el-radio-button>
+          <el-radio-button value="饮料"></el-radio-button>
         </el-radio-group>
         <el-input
           placeholder="搜索店铺名称"
@@ -20,7 +20,7 @@
           style="width: 300px"
         ></el-input>
         <el-button icon="el-icon-search" @click="searchShop" class="search">搜索</el-button>
-        <el-button size="small" @click="$router.push('/shoppingtrolley')" class="trolley"
+        <el-button size="small" @click="router.push('/shoppingtrolley')" class="trolley"
           >订单</el-button
         >
       </div>
@@ -55,14 +55,14 @@
                 <el-button
                   style="float: right; padding: 20px 0"
                   type="text"
-                  @click="$router.push(`/shop/${o.sId}`)"
+                  @click="router.push(`/shop/{o.sId}`)"
                   >进入店铺</el-button
                 >
               </el-header>
               <el-main>
-                <el-rate v-model="o.score" disabled show-score text-color="#ff9900">{{
-                  o.score
-                }}</el-rate>
+                <el-rate v-model="o.score" disabled show-score text-color="#ff9900">
+                  {{ o.score }}
+                </el-rate>
               </el-main>
               <el-footer> </el-footer>
             </el-container>
@@ -78,8 +78,10 @@
 
 <script setup>
 import userAddress from '@/components/Address.vue'
-import { inject, onMounted } from 'vue'
+import { ref, inject, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const $get = inject('$get')
 
 //data

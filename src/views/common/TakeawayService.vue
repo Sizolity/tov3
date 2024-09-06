@@ -5,13 +5,16 @@
 </template>
 
 <script setup>
-import { inject } from 'vue'
-import consumerHomePage from '/src/views/consumer/ConsumerHomePage.vue'
-import shopHomePage from '/src/views/shop/ShopHomePage.vue'
+import { inject, computed } from 'vue'
+import consumerHomePage from '@/views/consumer/ConsumerHomePage.vue'
+import shopHomePage from '@/views/shop/ShopHomePage.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const $db = inject('$db')
-const componentName = computed(() => {
-  const roles = $db.get('ROLES')
+const roles = $db.get('ROLES')
+
+const componentName = computed((roles) => {
   return roles === '"shop"' ? shopHomePage : consumerHomePage
 })
 
@@ -23,7 +26,7 @@ const componentName = computed(() => {
 //   },
 //   computed: {
 //     componentName() {
-//       if (proxy.$db.get('ROLES') === '"shop"') {
+//       if ($db.get('ROLES') === '"shop"') {
 //         return 'shopHomePage'
 //       } else {
 //         return 'consumerHomePage'

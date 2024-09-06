@@ -10,23 +10,23 @@
             @open="handleOpen"
             @close="handleClose"
           >
-            <el-menu-item index="1" class="title" @click="$router.push('/consumerinfo/info')">
+            <el-menu-item index="1" class="title" @click="router.push('/consumerinfo/info')">
               <i class="el-icon-user"></i>
               <span slot="title">个人资料</span>
             </el-menu-item>
-            <el-menu-item index="2" class="title" @click="$router.push('/consumerinfo/history')">
+            <el-menu-item index="2" class="title" @click="router.push('/consumerinfo/history')">
               <i class="el-icon-s-order"></i>
               <span slot="title">历史订单</span>
             </el-menu-item>
-            <el-menu-item index="3" class="title" @click="$router.push('/consumerinfo/contact')">
+            <el-menu-item index="3" class="title" @click="router.push('/consumerinfo/contact')">
               <i class="el-icon-bell"></i>
               <span slot="title">店家互动</span>
             </el-menu-item>
-            <el-menu-item index="4" class="title" @click="$router.push('/consumerinfo/password')">
+            <el-menu-item index="4" class="title" @click="router.push('/consumerinfo/password')">
               <i class="el-icon-key"></i>
               <span slot="title">修改密码</span>
             </el-menu-item>
-            <el-menu-item index="5" class="title" @click="$router.push('/consumerinfo/setting')">
+            <el-menu-item index="5" class="title" @click="router.push('/consumerinfo/setting')">
               <i class="el-icon-setting"></i>
               <span slot="title">账号设置</span>
             </el-menu-item>
@@ -46,7 +46,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-const route = useRoute()
+const router = useRoute()
 
 // Method to handle opening
 const handleOpen = (key) => {
@@ -62,7 +62,7 @@ const handleClose = (key) => {
 
 // Computed property to determine the current page index
 const nowPageIndex = computed(() => {
-  switch (route.path) {
+  switch (router.path) {
     case '/consumerinfo/info':
       return '1'
     case '/consumerinfo/history':

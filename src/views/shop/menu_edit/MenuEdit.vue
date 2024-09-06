@@ -142,12 +142,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import UploadPicture from '@/components/UploadPicture.vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $db = inject('$db')
+const $post = inject('$post')
+const $get = inject('$get')
 
 const goodsList = ref([])
 const search = ref('')
@@ -168,8 +170,8 @@ const nowEditIndex = ref(null)
 // 获取商品列表
 const fetchGoodsList = async () => {
   try {
-    const res = await this.$get('/shop/getAllGoodsBySid', {
-      SID: this.$db.get('USER_ID')
+    const res = await $get('/shop/getAllGoodsBySid', {
+      SID: $db.get('USER_ID')
     })
     goodsList.value = res.data.data
   } catch (err) {
@@ -201,12 +203,12 @@ const handleEdit = (index, row) => {
 // 删除商品
 const handleDelete = async (index, row) => {
   try {
-    await this.$confirm('是否确认删除此菜单?', '提示', {
+    await ElMessageBox.confirm('是否确认删除此菜单?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     })
-    await this.$post('/shop/deleteGoodsByGid', {
+    await $post('/shop/deleteGoodsByGid', {
       GID: row.id
     })
     ElMessage({ type: 'info', message: '删除成功' })
@@ -222,8 +224,8 @@ const submitChange = async () => {
   try {
     if (addOpt.value) {
       // 添加商品
-      const res = await this.$post('/shop/addGoods', {
-        SID: Number(this.$db.get('USER_ID')),
+      const res = await $post('/shop/addGoods', {
+        SID: Number($db.get('USER_ID')),
         name: String(form.value.name),
         price: Number(form.value.price),
         stock: Number(form.value.stock),
@@ -235,7 +237,7 @@ const submitChange = async () => {
       ElMessage({ type: 'info', message: '已添加商品' })
     } else {
       // 修改商品
-      const res = await this.$post('/shop/updateGoods', {
+      const res = await $post('/shop/updateGoods', {
         GID: nowEditGid.value,
         name: form.value.name,
         price: form.value.price,

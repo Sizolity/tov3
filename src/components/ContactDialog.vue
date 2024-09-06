@@ -20,7 +20,7 @@
             <el-tag type="warning" size="small" style="margin-left: 5px; margin-right: 5px">
               <el-link
                 v-if="!isShop()"
-                @click="$router.push(`/shop/${nowContactList[0].sid}`)"
+                @click="router.push(`/shop/{nowContactList[0].sid}`)"
                 type="primary"
               >
                 {{ nowContactList[0].sname }}
@@ -99,11 +99,16 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted, getCurrentInstance } from 'vue'
+import { ref, defineProps, onMounted, inject } from 'vue'
+import { useRouter } from 'vue-router'
 import util from '@/utils/util'
+import { ElMessage } from 'element-plus'
 
+const router = useRouter()
 const props = defineProps(['other'])
-const instance = getCurrentInstance()
+
+const $db = inject('$db')
+const $get = inject('$get')
 
 // 响应式数据定义
 const contactList = ref([])
@@ -129,7 +134,7 @@ onMounted(() => {
     let url = '',
       otherId
 
-    if (instance.appContext.config.globalProperties.$db.get('ROLES') === '"shop"') {
+    if ($db.get('ROLES') === '"shop"') {
       url = '/contact/getInfoBySid'
       otherId = 'cid'
     } else {
@@ -137,10 +142,9 @@ onMounted(() => {
       otherId = 'sid'
     }
 
-    instance.appContext.config.globalProperties
-      .$get(url, {
-        uid: instance.appContext.config.globalProperties.$db.get('USER_ID')
-      })
+    $get(url, {
+      uid: $db.get('USER_ID')
+    })
       .then((res) => {
         contactList.value = res.data.data
         filterList.value = util.formatList(contactList.value, otherId)
@@ -151,20 +155,19 @@ onMounted(() => {
       .catch((err) => console.log(err))
   } else {
     let params
-    if (instance.appContext.config.globalProperties.$db.get('ROLES') === '"shop"') {
+    if ($db.get('ROLES') === '"shop"') {
       params = {
-        sid: instance.appContext.config.globalProperties.$db.get('USER_ID'),
+        sid: $db.get('USER_ID'),
         cid: props.other
       }
     } else {
       params = {
         sid: props.other,
-        cid: instance.appContext.config.globalProperties.$db.get('USER_ID')
+        cid: $db.get('USER_ID')
       }
     }
 
-    instance.appContext.config.globalProperties
-      .$get('/contact/getInfoBySidCid', params)
+    $get('/contact/getInfoBySidCid', params)
       .then((res) => {
         contactList.value = res.data.data
         filterList.value = [contactList.value]
@@ -175,35 +178,33 @@ onMounted(() => {
       .catch((err) => console.log(err))
   }
 
-  // 设置 websocket
-  instance.appContext.config.globalProperties.$websocket.onmessage = (res) => {
-    // TODO: 判断是否属于自己的聊天
-    const data = JSON.parse(res.data)
-    if (isShop()) {
-      if (data.state === '1') return
-    } else {
-      if (data.state === '0') return
-    }
-    for (let i = 0, len = filterList.value.length; i < len; i++) {
-      if (
-        String(filterList.value[i][0].sid) === String(data.sid) &&
-        String(filterList.value[i][0].cid) === String(data.cid)
-      ) {
-        filterList.value[i].push(data)
-      }
-    }
-  }
+  // // 设置 websocket
+  // $websocket.onmessage = (res) => {
+  //   // TODO: 判断是否属于自己的聊天
+  //   const data = JSON.parse(res.data)
+  //   if (isShop()) {
+  //     if (data.state === '1') return
+  //   } else {
+  //     if (data.state === '0') return
+  //   }
+  //   for (let i = 0, len = filterList.value.length; i < len; i++) {
+  //     if (
+  //       String(filterList.value[i][0].sid) === String(data.sid) &&
+  //       String(filterList.value[i][0].cid) === String(data.cid)
+  //     ) {
+  //       filterList.value[i].push(data)
+  //     }
+  //   }
+  // }
 })
 
 // 辅助函数
 function isShop() {
-  return instance.appContext.config.globalProperties.$db.get('ROLES') === '"shop"'
+  return $db.get('ROLES') === '"shop"'
 }
 
 function uName(u) {
-  return instance.appContext.config.globalProperties.$db.get('ROLES') === '"shop"'
-    ? u[0].cname
-    : u[0].sname
+  return $db.get('ROLES') === '"shop"' ? u[0].cname : u[0].sname
 }
 
 // 发送消息
@@ -213,14 +214,14 @@ function sendMsg() {
   if (isShop()) {
     params = {
       cid: nowOtherId.value,
-      sid: instance.appContext.config.globalProperties.$db.get('USER_ID'),
+      sid: $db.get('USER_ID'),
       ctime: date,
       state: '1',
       content: msg.value
     }
   } else {
     params = {
-      cid: instance.appContext.config.globalProperties.$db.get('USER_ID'),
+      cid: $db.get('USER_ID'),
       sid: nowOtherId.value,
       ctime: date,
       state: '0',
@@ -228,16 +229,15 @@ function sendMsg() {
     }
   }
 
-  instance.appContext.config.globalProperties
-    .$get('/contact/add', params)
+  $get('/contact/add', params)
     .then((res) => {
-      instance.appContext.config.globalProperties.$message({
+      ElMessage({
         message: '发送成功',
         type: 'info'
       })
       msg.value = ''
       nowContactList.value.push(params)
-      instance.appContext.config.globalProperties.$websocket.send(JSON.stringify(params))
+      // $websocket.send(JSON.stringify(params))
     })
     .catch((err) => console.log(err))
 }

@@ -35,11 +35,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { ElNotification, ElMessageBox } from 'element-plus'
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $db = inject('$db')
+const $get = inject('$get')
 
 // 响应式数据
 const oldData = ref({})
@@ -65,7 +66,7 @@ const rules = {
 
 // 组件挂载时获取用户信息
 onMounted(() => {
-  oldData.value = JSON.parse(proxy.$db.get('USER_INFO'))
+  oldData.value = JSON.parse($db.get('USER_INFO'))
   dataReset()
 })
 
@@ -73,23 +74,23 @@ onMounted(() => {
 const submitForm = async (formName) => {
   const valid = await validateForm(formName)
   if (valid) {
-    MessageBox.confirm('是否确认修改个人信息?', '提示', {
+    ElMessageBox.confirm('是否确认修改个人信息?', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     })
       .then(async () => {
         try {
-          const res = await proxy.$get('/shop/editInfo', {
-            SID: proxy.$db.get('USER_ID'),
+          const res = await $get('/shop/editInfo', {
+            SID: $db.get('USER_ID'),
             name: ruleForm.value.name,
             telephone: ruleForm.value.telephone,
             address: ruleForm.value.address,
             managerName: ruleForm.value.managerName,
             managerEmail: ruleForm.value.managerEmail
           })
-          proxy.$db.save('USER_INFO', res.data.data)
-          oldData.value = JSON.parse(proxy.$db.get('USER_INFO'))
+          $db.save('USER_INFO', res.data.data)
+          oldData.value = JSON.parse($db.get('USER_INFO'))
           dataReset()
           Notification.success({
             title: '系统提示',
@@ -100,7 +101,7 @@ const submitForm = async (formName) => {
         }
       })
       .catch(() => {
-        Notification.info({
+        ElNotification.info({
           title: '系统提示',
           message: '已取消更改'
         })
@@ -114,7 +115,7 @@ const submitForm = async (formName) => {
 
 // 重置表单
 const resetForm = (formName) => {
-  proxy.$refs[formName].resetFields()
+  formName.resetFields()
   dataReset()
 }
 
@@ -132,7 +133,7 @@ const dataReset = () => {
 // 验证表单
 const validateForm = (formName) => {
   return new Promise((resolve) => {
-    proxy.$refs[formName].validate((valid) => {
+    formName.validate((valid) => {
       resolve(valid)
     })
   })

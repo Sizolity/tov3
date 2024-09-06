@@ -10,23 +10,23 @@
             @open="handleOpen"
             @close="handleClose"
           >
-            <el-menu-item index="1" class="title" @click="$router.push('/shopinfo/info')">
+            <el-menu-item index="1" class="title" @click="router.push('/shopinfo/info')">
               <i class="el-icon-platform-eleme"></i>
               <span slot="title">店铺资料</span>
             </el-menu-item>
-            <el-menu-item index="2" class="title" @click="$router.push('/shopinfo/history')">
+            <el-menu-item index="2" class="title" @click="router.push('/shopinfo/history')">
               <i class="el-icon-s-order"></i>
               <span slot="title">历史订单</span>
             </el-menu-item>
-            <el-menu-item index="3" class="title" @click="$router.push('/shopinfo/contact')">
+            <el-menu-item index="3" class="title" @click="router.push('/shopinfo/contact')">
               <i class="el-icon-bell"></i>
               <span slot="title">顾客互动</span>
             </el-menu-item>
-            <el-menu-item index="4" class="title" @click="$router.push('/shopinfo/password')">
+            <el-menu-item index="4" class="title" @click="router.push('/shopinfo/password')">
               <i class="el-icon-key"></i>
               <span slot="title">修改密码</span>
             </el-menu-item>
-            <el-menu-item index="5" class="title" @click="$router.push('/shopinfo/setting')">
+            <el-menu-item index="5" class="title" @click="router.push('/shopinfo/setting')">
               <i class="el-icon-setting"></i>
               <span slot="title">账号设置</span>
             </el-menu-item>

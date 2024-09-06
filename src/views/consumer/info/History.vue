@@ -19,9 +19,9 @@
     <el-table-column sortable prop="num" label="购买数量"> </el-table-column>
     <el-table-column prop="shopName" label="商店名字">
       <template slot-scope="scope">
-        <el-link @click.native="$router.push(`/shop/${scope.row.sid}`)">{{
-          scope.row.shopName
-        }}</el-link>
+        <el-link @click.native="router.push(`/shop/${scope.row.sid}`)">
+          {{ scope.row.shopName }}
+        </el-link>
       </template>
     </el-table-column>
     <el-table-column sortable prop="total" label="总价"> </el-table-column>
@@ -48,6 +48,7 @@
 import { ref, reactive, computed, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const history_list = ref([])
 const spanArr = ref([])
 let pos = ref(1) // 用于追踪合并行的位置

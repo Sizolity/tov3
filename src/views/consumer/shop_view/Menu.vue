@@ -15,20 +15,20 @@
 
       <el-radio-group v-model="radio" fill="#FFCD56">
         <el-radio-button
-          label="全部"
+          value="全部"
           class="radio"
           @click.native="dataInPage = goodsList"
         ></el-radio-button>
         <el-radio-button
-          label="主食"
+          value="主食"
           @click.native="dataInPage = goodsList.filter((data) => '主食' === data.type)"
         ></el-radio-button>
         <el-radio-button
-          label="小吃"
+          value="小吃"
           @click.native="dataInPage = goodsList.filter((data) => '小吃' === data.type)"
         ></el-radio-button>
         <el-radio-button
-          label="饮料"
+          value="饮料"
           @click.native="dataInPage = goodsList.filter((data) => '饮料' === data.type)"
         ></el-radio-button>
       </el-radio-group>

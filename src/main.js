@@ -85,4 +85,10 @@ app.config.globalProperties.routerAppend = (path, pathToAppend) => {
   return path + (path.endsWith('/') ? '' : '/') + pathToAppend
 }
 
+// test
+db.clear()
+db.save('USER_TOKEN', [1])
+db.save('USER', 'liznsalt')
+db.save('USER_ROUTER', [1])
+
 app.mount('#app')

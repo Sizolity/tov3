@@ -44,15 +44,19 @@
         />
       </el-form-item>
       <el-button type="warning" class="sign-btn" v-on:click="onSubmit">注 册</el-button>
-      <!--      <el-button class="login-btn" v-on:click="$router.push('/login')">登 录</el-button>-->
+      <!--      <el-button class="login-btn" v-on:click="router.push('/login')">登 录</el-button>-->
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ElNotification, ElMessageBox } from 'element-plus'
+import { inject, ref } from 'vue'
+import { ElNotification, ElMessageBox, ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+// 全局吧变量
+const $syspost = inject('$syspost')
+const router = useRouter()
 // 响应式数据
 const form = ref({
   username: '',
@@ -129,7 +133,7 @@ const onSubmit = async () => {
 
   // FIXME: 全部验证成功，开始注册
   try {
-    const res = await proxy.$syspost('/signIn/consumer', {
+    const res = await $syspost('/signIn/consumer', {
       name: form.value.username,
       password: form.value.password,
       telephone: form.value.phone
@@ -138,16 +142,16 @@ const onSubmit = async () => {
 
     // 注册成功
     if (msg === 'SUCCESS') {
-      MessageBox.confirm('注册成功，是否前去登录?', '提示', {
+      ElMessageBox.confirm('注册成功，是否前去登录?', '提示', {
         confirmButtonText: '前去登录',
         cancelButtonText: '回到主页',
         type: 'warning'
       })
         .then(() => {
-          proxy.$router.push('/login')
+          router.push('/login')
         })
         .catch(() => {
-          proxy.$router.push('/index')
+          router.push('/index')
         })
     } else {
       Notification.error({

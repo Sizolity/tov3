@@ -82,13 +82,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { ElMessage, ElDialog, ElForm } from 'element-plus'
-// import selectAddress from '@/components/Address.vue'
+import { inject, ref } from 'vue'
+import { ElMessage, ElForm, ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
+// 顶层注入
+const router = useRouter()
+const $syspost = inject('$syspost')
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
-
+// 局部变量
+const active = ref(0)
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 const applyForm = ref({
@@ -158,16 +160,16 @@ const rules = {
 }
 
 // 验证密码
-const validatePassword = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入密码'))
-  } else {
-    if (applyForm.value.checkPass !== '') {
-      applyForm.value.$refs.applyForm.validateField('checkPass')
-    }
-    callback()
-  }
-}
+// const validatePassword = (rule, value, callback) => {
+//   if (value === '') {
+//     callback(new Error('请输入密码'))
+//   } else {
+//     if (applyForm.value.checkPass !== '') {
+//       applyForm.value.validateField('checkPass')
+//     }
+//     callback()
+//   }
+// }
 
 const validatePassword2 = (rule, value, callback) => {
   if (value === '') {
@@ -177,6 +179,15 @@ const validatePassword2 = (rule, value, callback) => {
   } else {
     callback()
   }
+}
+
+const handleRemove = (file, fileList) => {
+  console.log(file, fileList)
+}
+
+const handlePictureCardPreview = (file) => {
+  dialogImageUrl = file.url
+  dialogVisible = true
 }
 
 // 注册方法
@@ -203,7 +214,6 @@ const next = async () => {
     ElMessage.error('两次密码不一致')
     return
   }
-
   // 表单验证成功，开始注册
   try {
     const res = await $syspost('/signIn/shop', {
@@ -224,10 +234,10 @@ const next = async () => {
         type: 'warning'
       })
         .then(() => {
-          proxy.$router.push('/login')
+          router.push('/login')
         })
         .catch(() => {
-          proxy.$router.push('/index')
+          router.push('/index')
         })
     } else {
       ElMessage.error(msg)

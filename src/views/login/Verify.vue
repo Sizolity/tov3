@@ -5,8 +5,8 @@
     <el-row class="t">?</el-row><el-row class="t">?</el-row>
     <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
       <el-radio-group v-model="radio" class="text">
-        <el-radio :label="1">用户</el-radio>
-        <el-radio :label="2">商家</el-radio>
+        <el-radio value="1">用户</el-radio>
+        <el-radio value="2">商家</el-radio>
       </el-radio-group>
 
       <el-form-item label="手机号" prop="username" class="form-item">
@@ -48,24 +48,27 @@
       </el-form-item>
 
       <el-row>
-        <div class="code" @click="$router.push('/login')">>>>用户名密码登录>>></div>
+        <div class="code" @click="router.push('/login')">>>>用户名密码登录>>></div>
       </el-row>
       <el-row>
         <el-button type="warning" class="login-btn" v-on:click="onSubmit">登 录</el-button>
-        <el-button class="sign-btn" @click="$router.push('/signin')">注 册</el-button>
+        <el-button class="sign-btn" @click="router.push('/signin')">注 册</el-button>
       </el-row>
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/updateAccount'
 import { jwtDecode } from 'jwt-decode'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+const $syspost = inject('$syspost')
+const $db = inject('$db')
+
 const store = useAccountStore()
 const formRef = ref(null)
 

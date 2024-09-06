@@ -7,11 +7,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import comment from '/src/components/comment.vue'
 
-// 获取当前实例
-const { proxy } = getCurrentInstance()
+// global
+const $db = inject('$db')
+const $get = inject('$get')
 
 const comments = ref([]) // 使用 ref 定义响应式数组
 
@@ -49,10 +50,9 @@ const createReply = (replyData, parentComment, isConsumer = false) => ({
 
 // 获取历史订单
 const fetchOrderHistory = () => {
-  proxy
-    .$get('/shop/getOrderHistory', {
-      SID: proxy.$db.get('USER_ID')
-    })
+  $get('/shop/getOrderHistory', {
+    SID: $db.get('USER_ID')
+  })
     .then((res) => {
       console.log(res.data)
     })
@@ -61,10 +61,9 @@ const fetchOrderHistory = () => {
 
 // 获取评论
 const fetchComments = () => {
-  proxy
-    .$get('/commentary/getInfoBySid', {
-      Sid: proxy.$db.get('USER_ID')
-    })
+  $get('/commentary/getInfoBySid', {
+    Sid: $db.get('USER_ID')
+  })
     .then((res) => {
       let allComments = res.data.data
       for (let i = 0; i < allComments.length; i++) {
@@ -78,8 +77,7 @@ const fetchComments = () => {
 // 获取回复
 const fetchReplies = (commentId, index) => {
   // 商家回复
-  proxy
-    .$get('/shopReply/getInfoByCoid', { coid: commentId })
+  $get('/shopReply/getInfoByCoid', { coid: commentId })
     .then((res) => {
       let allShopReply = res.data.data
       allShopReply.forEach((reply) => {
@@ -93,8 +91,7 @@ const fetchReplies = (commentId, index) => {
 
 // 获取用户回复
 const fetchConsumerReplies = (commentId, index) => {
-  proxy
-    .$get('/consumerReply/getInfoByCoid', { coid: commentId })
+  $get('/consumerReply/getInfoByCoid', { coid: commentId })
     .then((res) => {
       let allConsumerReply = res.data.data
       allConsumerReply.forEach((reply) => {
