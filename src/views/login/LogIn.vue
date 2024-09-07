@@ -10,8 +10,8 @@
     <el-row class="t">?</el-row>
     <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
       <el-radio-group v-model="radio" class="text">
-        <el-radio value="1">用户</el-radio>
-        <el-radio value="2">商家</el-radio>
+        <el-radio :value="1">用户</el-radio>
+        <el-radio :value="2">商家</el-radio>
       </el-radio-group>
 
       <el-form-item label="用户名" prop="username" class="form-item">
@@ -38,7 +38,7 @@
       </el-row>
 
       <el-row>
-        <el-button type="warning" class="login-btn" @click="onSubmit('loginForm')">登 录</el-button>
+        <el-button type="warning" class="login-btn" @click="onSubmit">登 录</el-button>
         <el-button class="sign-btn" @click="router.push('/signin')">注 册</el-button>
       </el-row>
 
@@ -48,11 +48,11 @@
         </div>
       </el-row>
 
-      <el-dialog :visible.sync="dialogVisible" width="30%">
+      <el-dialog :model-value="dialogVisible" width="30%" v-on:close="dialogVisible = false">
         <span>请输入用户名和密码</span>
-        <span slot="footer" class="dialog-footer">
+        <!-- <span slot="footer" class="dialog-footer">
           <el-button type="warning" size="small" @click="dialogVisible = false">确 定</el-button>
-        </span>
+        </span> -->
       </el-dialog>
     </el-form>
   </div>
@@ -60,26 +60,25 @@
 
 <script setup>
 import { ref, inject } from 'vue'
-import { useSyspostStore } from '../../stores/pwdre'
 import { useAccountStore } from '../../stores/updateAccount'
-
 import { jwtDecode } from 'jwt-decode'
 import { ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-// const syspostStore = useSyspostStore()
 const accountStore = useAccountStore()
 
+// global
 const syspost = inject('$syspost')
+const $db = inject('$db')
+
 // 响应式数据
+const loginForm = ref(null)
 const radio = ref(1)
 const form = ref({
   username: '',
   password: ''
 })
-
-const $db = inject('$db')
 
 // 表单验证规则
 const rules = {
@@ -91,35 +90,39 @@ const rules = {
 const dialogVisible = ref(false)
 
 // 提交处理
-const onSubmit = (formName) => {
-  const valid = validateForm(formName)
-  if (valid) {
-    let url = radio.value === 1 ? 'consumer/login' : 'shop/login'
-
-    syspost({
-      url,
-      data: {
-        username: form.value.username,
-        password: form.value.password
-      }
-    })
-      .then((r) => {
-        saveLoginData(r.data)
-        // 跳转到首页并重载
-        router.push('/index')
-        location.reload()
+const onSubmit = () => {
+  // console.log(loginForm.value, 'loginForm.value')
+  loginForm.value
+    .validate()
+    .then((res) => {
+      // console.log(res, '校验成功')
+      const url = radio.value === 1 ? 'consumer/login' : 'shop/login'
+      syspost({
+        url,
+        data: {
+          username: form.value.username,
+          password: form.value.password
+        }
       })
-      .catch((err) => {
-        ElNotification.error({
-          title: '系统提示',
-          message: '账号或密码错误'
+        .then((r) => {
+          saveLoginData(r.data)
+          // 跳转到首页并重载
+          router.push('/index')
+          location.reload()
         })
-        // 清空用户信息
-        $db.clear('clearUserData')
-      })
-  } else {
-    dialogVisible.value = true
-  }
+        .catch((err) => {
+          ElNotification.error({
+            title: '系统提示',
+            message: '账号或密码错误'
+          })
+          // 清空用户信息
+          $db.clear('clearUserData')
+        })
+    })
+    .catch((err) => {
+      dialogVisible.value = true
+      console.log(err, '校验失败')
+    })
 }
 
 // 保存登录数据
@@ -139,17 +142,6 @@ const saveLoginData = (data) => {
 const resetPassword = () => {
   const path = radio.value === 1 ? '/password_reset/consumer' : '/password_reset/shop'
   router.push(path)
-}
-
-//todo
-// 验证表单
-const validateForm = (formName) => {
-  return new Promise((resolve) => {
-    // # todo
-    formName.validate((valid) => {
-      resolve(valid)
-    })
-  })
 }
 </script>
 

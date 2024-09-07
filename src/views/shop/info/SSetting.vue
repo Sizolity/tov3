@@ -24,10 +24,8 @@
           <el-input v-model="ruleForm.managerEmail" placeholder="请输入邮箱"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="warning" @click="submitForm('ruleForm')" class="login-btn"
-            >修改</el-button
-          >
-          <el-button @click="resetForm('ruleForm')" class="reset-btn">重置</el-button>
+          <el-button type="warning" @click="submitForm" class="login-btn">修改</el-button>
+          <el-button @click="resetForm" class="reset-btn">重置</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -71,51 +69,52 @@ onMounted(() => {
 })
 
 // 提交表单
-const submitForm = async (formName) => {
-  const valid = await validateForm(formName)
-  if (valid) {
-    ElMessageBox.confirm('是否确认修改个人信息?', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-      .then(async () => {
-        try {
-          const res = await $get('/shop/editInfo', {
-            SID: $db.get('USER_ID'),
-            name: ruleForm.value.name,
-            telephone: ruleForm.value.telephone,
-            address: ruleForm.value.address,
-            managerName: ruleForm.value.managerName,
-            managerEmail: ruleForm.value.managerEmail
-          })
-          $db.save('USER_INFO', res.data.data)
-          oldData.value = JSON.parse($db.get('USER_INFO'))
-          dataReset()
-          Notification.success({
-            title: '系统提示',
-            message: '修改成功!'
-          })
-        } catch (err) {
-          console.error(err)
-        }
+const submitForm = async () => {
+  ruleForm.value
+    .validate()
+    .then((res) => {
+      ElMessageBox.confirm('是否确认修改个人信息?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
-      .catch(() => {
-        ElNotification.info({
-          title: '系统提示',
-          message: '已取消更改'
+        .then(async () => {
+          try {
+            const res = await $get('/shop/editInfo', {
+              SID: $db.get('USER_ID'),
+              name: ruleForm.value.name,
+              telephone: ruleForm.value.telephone,
+              address: ruleForm.value.address,
+              managerName: ruleForm.value.managerName,
+              managerEmail: ruleForm.value.managerEmail
+            })
+            $db.save('USER_INFO', res.data.data)
+            oldData.value = JSON.parse($db.get('USER_INFO'))
+            dataReset()
+            Notification.success({
+              title: '系统提示',
+              message: '修改成功!'
+            })
+          } catch (err) {
+            console.error(err)
+          }
         })
-        dataReset()
-      })
-  } else {
-    console.log('error submit!!')
-    return false
-  }
+        .catch(() => {
+          ElNotification.info({
+            title: '系统提示',
+            message: '已取消更改'
+          })
+          dataReset()
+        })
+    })
+    .catch((err) => {
+      console.log('表单校验失败')
+    })
 }
 
 // 重置表单
-const resetForm = (formName) => {
-  formName.resetFields()
+const resetForm = () => {
+  ruleForm.value.resetFields()
   dataReset()
 }
 
@@ -128,15 +127,6 @@ const dataReset = () => {
     managerName: oldData.value.managerName,
     managerEmail: oldData.value.managerEmail
   }
-}
-
-// 验证表单
-const validateForm = (formName) => {
-  return new Promise((resolve) => {
-    formName.validate((valid) => {
-      resolve(valid)
-    })
-  })
 }
 </script>
 

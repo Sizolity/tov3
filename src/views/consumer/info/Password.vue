@@ -34,10 +34,8 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="warning" @click="submitForm('ruleForm')" class="login-btn"
-            >提交</el-button
-          >
-          <el-button @click="resetForm('ruleForm')" class="reset-btn">重置</el-button>
+          <el-button type="warning" @click="submitForm" class="login-btn">提交</el-button>
+          <el-button @click="resetForm" class="reset-btn">重置</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -46,7 +44,11 @@
 
 <script setup>
 import { ElNotification } from 'element-plus'
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
+
+// global
+const $post = inject('$post')
+const $db = inject('$db')
 
 const ruleForm = ref({
   oldPass: '',
@@ -64,7 +66,7 @@ const validatePass = (rule, value, callback) => {
     callback(new Error('请输入密码'))
   } else {
     if (this.ruleForm.checkPass !== '') {
-      this.$refs.ruleForm.validateField('checkPass')
+      ruleForm.validateField('checkPass')
     }
     callback()
   }
@@ -72,18 +74,19 @@ const validatePass = (rule, value, callback) => {
 const validatePass2 = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请再次输入密码'))
-  } else if (value !== this.ruleForm.pass) {
+  } else if (value !== ruleForm.pass) {
     callback(new Error('两次输入密码不一致!'))
   } else {
     callback()
   }
 }
 
-const submitForm = (formName) => {
-  this.$refs[formName].validate((valid) => {
-    if (valid) {
-      this.$post('/consumer/changePassword', {
-        CID: this.$db.get('USER_ID'),
+const submitForm = () => {
+  ruleForm.value
+    .validate()
+    .then((res) => {
+      $post('/consumer/changePassword', {
+        CID: $db.get('USER_ID'),
         oldPassword: ruleForm.oldPass,
         newPassword: ruleForm.pass
       })
@@ -96,18 +99,17 @@ const submitForm = (formName) => {
         .catch((err) => {
           console.log(err)
         })
-    } else {
+    })
+    .catch((err) => {
       ElNotification.error({
         title: '系统提示',
         message: '两次密码不一致'
       })
-      return false
-    }
-  })
+    })
 }
 
-const resetForm = (formName) => {
-  this.$refs[formName].resetFields()
+const resetForm = () => {
+  ruleForm.value.resetFields()
 }
 
 // export default {

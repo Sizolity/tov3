@@ -30,9 +30,7 @@
           <el-input v-model="ruleForm.address"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="warning" @click="submitForm('ruleForm')" class="login-btn"
-            >修改</el-button
-          >
+          <el-button type="warning" @click="submitForm" class="login-btn">修改</el-button>
           <el-button @click="resetForm('ruleForm')" class="reset-btn">重置</el-button>
         </el-form-item>
       </el-form>
@@ -45,7 +43,9 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { inject, onMounted, ref } from 'vue'
 
+// global
 const $db = inject('$db')
+const $get = inject('$get')
 
 let oldData = ref({})
 let ruleForm = ref({
@@ -78,9 +78,10 @@ onMounted(() => {
   dataReset()
 })
 
-const submitForm = (formName) => {
-  this.$refs[formName].validate((valid) => {
-    if (valid) {
+const submitForm = () => {
+  ruleForm.value
+    .validate()
+    .then((res) => {
       // 先询问是否修改
       ElMessageBox.confirm('是否确认修改个人信息?', '提示', {
         confirmButtonText: '确定',
@@ -99,7 +100,7 @@ const submitForm = (formName) => {
           })
             .then((res) => {
               $db.save('USER_INFO', res.data.data)
-              oldData = JSON.parse(this.$db.get('USER_INFO'))
+              oldData = JSON.parse($db.get('USER_INFO'))
               dataReset()
               // 修改成功
               ElMessage({
@@ -120,15 +121,14 @@ const submitForm = (formName) => {
           })
           this.dataReset()
         })
-    } else {
-      console.log('error submit!!')
-      return false
-    }
-  })
+    })
+    .catch((err) => {
+      console.log(err, '校验失败')
+    })
 }
 
-const resetForm = (formName) => {
-  this.$refs[formName].resetFields()
+const resetForm = () => {
+  ruleForm.value.resetFields()
   dataReset()
 }
 

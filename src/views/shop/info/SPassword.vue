@@ -34,10 +34,8 @@
           ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="warning" @click="submitForm('ruleForm')" class="login-btn"
-            >提交</el-button
-          >
-          <el-button @click="resetForm('ruleForm')" class="reset-btn">重置</el-button>
+          <el-button type="warning" @click="submitForm" class="login-btn">提交</el-button>
+          <el-button @click="resetForm" class="reset-btn">重置</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -45,6 +43,7 @@
 </template>
 
 <script setup>
+import { ElNotification } from 'element-plus'
 import { inject, ref } from 'vue'
 
 // global
@@ -60,21 +59,24 @@ const ruleForm = ref({
 
 // 表单验证规则
 const rules = {
-  pass: [{ validator: validatePass, trigger: 'blur' }],
-  checkPass: [{ validator: validatePass2, trigger: 'blur' }]
+  pass: [{ required: true, min: 6, max: 20, message: '长度为6-20个字符', trigger: 'blur' }],
+  checkPass: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
+  ]
 }
 
-// 密码验证函数
-const validatePass = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入密码'))
-  } else {
-    if (ruleForm.value.checkPass !== '') {
-      validateField('checkPass')
-    }
-    callback()
-  }
-}
+// // 密码验证函数
+// const validatePass = (rule, value, callback) => {
+//   if (value === '') {
+//     callback(new Error('请输入密码'))
+//   } else {
+//     if (ruleForm.value.checkPass !== '') {
+//       validateField('checkPass')
+//     }
+//     callback()
+//   }
+// }
 
 const validatePass2 = (rule, value, callback) => {
   if (value === '') {
@@ -87,42 +89,31 @@ const validatePass2 = (rule, value, callback) => {
 }
 
 // 提交表单
-const submitForm = async (formName) => {
-  const valid = await validateForm(formName)
-  if (valid) {
-    try {
-      const res = await $post('/shop/changePassword', {
+const submitForm = async () => {
+  ruleForm.value
+    .validate()
+    .then(async (res) => {
+      await $post('/shop/changePassword', {
         SID: $db.get('USER_ID'),
         oldPassword: ruleForm.value.oldPass,
         newPassword: ruleForm.value.pass
       })
-      Notification.success({
+      ElNotification.success({
         title: '系统提示',
         message: '修改成功'
       })
-    } catch (err) {
-      console.error(err)
-    }
-  } else {
-    Notification.error({
-      title: '系统提示',
-      message: '两次密码不一致'
     })
-  }
+    .catch((err) => {
+      ElNotification.error({
+        title: '系统提示',
+        message: '两次密码不一致'
+      })
+    })
 }
 
 // 重置表单
-const resetForm = (formName) => {
-  formName.resetFields()
-}
-
-// 验证表单
-const validateForm = (formName) => {
-  return new Promise((resolve) => {
-    formName.validate((valid) => {
-      resolve(valid)
-    })
-  })
+const resetForm = () => {
+  ruleForm.value.resetFields()
 }
 </script>
 

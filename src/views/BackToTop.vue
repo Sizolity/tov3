@@ -36,20 +36,21 @@ const customStyle = ref({
 })
 const transitionName = ref('fade')
 
-const visible = computed(() => {
-  return window.scrollY > visibilityHeight.value
-})
-
+const visible = ref(null)
 const isMoving = ref(false)
 const interval = ref(null)
 
 const handleScroll = () => {
-  visible.value = window.pageYOffset > visibilityHeight.value
+  visible.value = window.scrollY > visibilityHeight.value
 }
 
+const computeonscroll = computed(() => {
+  return window.scrollY > visibilityHeight.value
+})
+visible.value = computeonscroll.value
 const backToTop = () => {
   if (isMoving.value) return
-  const start = window.pageYOffset
+  const start = window.scrollY
   let i = 0
   isMoving.value = true
   interval.value = setInterval(() => {
