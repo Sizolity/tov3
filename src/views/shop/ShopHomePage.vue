@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-col :span="12" :offset="6">
-      <!-- emit 注入位置 -->
+      <!-- emit  comment 注入位置 -->
       <comment :comments="comments" @add="addNewReplay" @remove="removeReply"></comment>
     </el-col>
   </el-container>

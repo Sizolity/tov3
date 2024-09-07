@@ -27,7 +27,10 @@
 import { ElMessage } from 'element-plus'
 import { ref, watch } from 'vue'
 
+// global
 const props = defineProps(['upUrl'])
+defineEmits(['getUrl'])
+
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 const fileList = ref([{ name: '', url: '' }])
@@ -50,11 +53,10 @@ function handleSuccess(res, file) {
     message: '图片上传成功',
     duration: 6000
   })
-  if (file.response.success) {
-    // todo ? editor -> emit
-    // 假设 editor 是在父组件中定义的
-    editor.picture = file.response.message // 将返回的文件储存路径赋值 picture 字段
-  }
+  // ? 未作定义editor
+  // if (file.response.success) {
+  //   editor.picture = file.response.message // 将返回的文件储存路径赋值 picture 字段
+  // }
 }
 
 // 删除文件之前的钩子函数

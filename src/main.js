@@ -87,9 +87,9 @@ app.config.globalProperties.routerAppend = (path, pathToAppend) => {
 
 // test
 // db.clear()
-db.save('USER_TOKEN', [1])
-db.save('USER', 'liznsalt')
-db.save('USER_ROUTER', [1])
+// db.save('USER_TOKEN', [1])
+// db.save('USER', 'liznsalt')
+// db.save('USER_ROUTER', [1])
 
 console.log(db.get('USER'))
 app.mount('#app')

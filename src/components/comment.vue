@@ -90,6 +90,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import util from '/src/utils/util'
 
 //global
+defineEmits(['add', 'remove'])
 const $get = inject('$get')
 const $db = inject('$db')
 
@@ -120,7 +121,7 @@ const commitComment = async (showItemId_, inputComment_, replyIndex_) => {
   })
     .then((res) => {
       // 更新父组件视图
-      $emit('add', replyIndex, {
+      emit('add', replyIndex, {
         id: String(showItemId) + String($db.get('USER_ID')), //主键id, 感觉没卵用
         commentId: comments[replyIndex].id, //父评论id，即父亲的id
         fromId: $db.get('USER_ID'), //评论者id
@@ -154,7 +155,7 @@ const commitComment = async (showItemId_, inputComment_, replyIndex_) => {
     })
 }
 
-const deleteComment = async (idx, reply) => {
+const deleteComment = async (idx, ridx, item, reply) => {
   console.log(reply.fromId)
 
   let url = ''
@@ -177,7 +178,7 @@ const deleteComment = async (idx, reply) => {
       })
         .then((res) => {
           // 更新父组件视图
-          $emit('remove', idx, ridx)
+          emit('remove', idx, ridx) // ? ridx / idx 暂未在源码内找到相关定义
           ElMessage({
             type: 'info',
             message: '已删除',

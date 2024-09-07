@@ -69,7 +69,7 @@ const router = useRouter()
 const accountStore = useAccountStore()
 
 // global
-const syspost = inject('$syspost')
+const $syspost = inject('$syspost')
 const $db = inject('$db')
 
 // 响应式数据
@@ -97,7 +97,10 @@ const onSubmit = () => {
     .then((res) => {
       // console.log(res, '校验成功')
       const url = radio.value === 1 ? 'consumer/login' : 'shop/login'
-      syspost({
+      console.log(url)
+      console.log(form.value.username)
+      // ??? 无法登录
+      $syspost({
         url,
         data: {
           username: form.value.username,
