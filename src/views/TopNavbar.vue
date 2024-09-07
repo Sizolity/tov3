@@ -146,17 +146,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, inject } from 'vue'
 import { useRouter } from 'vue-router'
-// 获取当前实例
 
+//global
+const db = inject('$db')
 const router = useRouter()
 
 //局部变量
 const activeIndex = ref('1')
 const isFixed = ref(false)
 const offsetTop = ref(0)
-
-//db解析
-const db = inject('$db')
 
 // 设置bar浮动阈值为 #fixedBar 至页面顶部的距离
 const setOffsetTop = () => {

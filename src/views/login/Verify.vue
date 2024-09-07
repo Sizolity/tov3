@@ -3,6 +3,7 @@
     <el-row class="t">?</el-row><el-row class="t">?</el-row> <el-row class="t">?</el-row
     ><el-row class="t">?</el-row> <el-row class="t">?</el-row><el-row class="t">?</el-row>
     <el-row class="t">?</el-row><el-row class="t">?</el-row>
+
     <el-form ref="loginForm" :model="form" :rules="rules" label-width="80px" class="login-box">
       <el-radio-group v-model="radio" class="text">
         <el-radio value="1">用户</el-radio>
@@ -138,6 +139,7 @@ const timer = () => {
 }
 
 // 表单提交
+// todo 表单校验适应性修改 valitdate
 const onSubmit = () => {
   // 验证手机号格式
   const reg = /^((13|14|15|17|18)[0-9]\d{8})$/

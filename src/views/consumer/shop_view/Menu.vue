@@ -177,332 +177,17 @@
     </el-dialog>
   </div>
 </template>
-
-<!-- <script //>
-import GoodsCard from '@/components/card/GoodsCard.vue'
-import CartDialog from '@/components/CartDialog.vue'
-
-export default {
-  name: 'Menu',
-  components: { GoodsCard, CartDialog },
-  props: ['sid'],
-  data() {
-    return {
-      SID: 1,
-
-      // 对话框
-      formLabelWidth: '70px',
-      dialogFormVisible: false,
-      nowEditIndex: 0,
-      selectedNum: 0,
-      selectedNumMap: {},
-
-      // 输入框
-      radio: '全部',
-      input: '',
-
-      // 数据
-      sortType: '默认',
-      dataInPage: [],
-      goodsList: [
-        {
-          buyCount: 331,
-          desc: '好康的，也是好吃的',
-          id: 3,
-          name: '炒面',
-          value: '炒面',
-          pictureUrl: 'http://localhost:8080/takeout/upload/201907011702352.jpg',
-          praise: 0,
-          price: 200,
-          sid: 1,
-          stock: 1,
-          type: '主食'
-        }
-      ],
-      visible: false
-    }
-  },
-  created() {
-    // console.log(this.$route.params)
-    this.SID = this.sid
-    this.refreshPage()
-  },
-  watch: {
-    sid() {
-      // console.log(this.$route.params)
-      this.SID = this.sid
-      this.refreshPage()
-    }
-  },
-  methods: {
-    // @[我们前端写的，不知道有什么用]
-    cardMessage(val) {
-      this.card = val
-    },
-    // 搜索
-    searchGoods() {
-      // console.log(this.radio)
-      this.dataInPage = this.goodsList.filter(
-        (data) =>
-          (this.radio === '全部' || data.type === this.radio) &&
-          (!this.input || data.name.toLowerCase().includes(this.input.toLowerCase()))
-      )
-    },
-
-    // 根据 SID 重新刷新页面 获取所有商品
-    refreshPage() {
-      // FIXME: 购物信息, 这里要先渲染，才能正确加载画面
-      this.$get('/consumer/getShoppingCartByCid', {
-        CID: this.$db.get('USER_ID')
-      })
-        .then((res) => {
-          let data = res.data.data
-          for (let i = 0, len = data.length; i < len; i++) {
-            this.selectedNumMap[data[i].gid] = data[i].num // 映射
-          }
-        })
-        .catch((err) => console.log(err))
-
-      // 商品信息
-      this.$get('/shop/getAllGoodsBySid', {
-        SID: this.SID
-      })
-        .then((res) => {
-          // console.log(res.data)
-          this.goodsList = res.data.data
-          for (let i = 0, len = this.goodsList.length; i < len; i++) {
-            this.goodsList[i].value = this.goodsList[i].name
-          }
-          this.dataInPage = this.goodsList
-          this.radio = '全部'
-        })
-        .catch((err) => console.log(err))
-    },
-    // 购买 卡片
-    showBuyCard(GID, index) {
-      // 先找出当前操作的下标
-      index = -1
-      for (let i = 0, len = this.goodsList.length; i < len; i++) {
-        if (this.goodsList[i].id === GID) {
-          index = i
-          break
-        }
-      }
-      if (index === -1) {
-        this.$message({
-          type: 'info',
-          message: '真奇怪，出错了.'
-        })
-        return
-      }
-      this.nowEditIndex = index
-      // 先计算此商品已经挑选数量
-      this.$get('/consumer/getShoppingCartByCid', {
-        CID: this.$db.get('USER_ID')
-      })
-        .then((res) => {
-          let data = res.data.data
-          for (let i = 0, len = data.length; i < len; i++) {
-            if (data[i].gid === GID) {
-              // 已有此购物
-              this.selectedNum = data[i].num
-              this.selectedNumMap[GID] = data[i].num
-              return
-            }
-          }
-          // 没有此购物
-          this.selectedNum = 0
-          this.selectedNumMap[GID] = 0
-        })
-        .catch((err) => console.log(err))
-      // 显示对话框
-      this.dialogFormVisible = true
-      this.visible = false
-    },
-    // 卡片操作
-    // 1 直接购买
-    buy(GID, date) {
-      this.$confirm('是否确认购买?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          // 开始购买
-          this.$get('/ShoppingCart/confirmItemWithDate', {
-            CID: this.$db.get('USER_ID'),
-            GID: GID,
-            now: date
-          })
-            .then((res) => {
-              this.$message({
-                type: 'info',
-                message: '购买成功'
-              })
-              // 挑选数量变为 0
-              this.selectedNum = 0
-              this.selectedNumMap[GID] = 0
-              // FIXME: 广播通知所有商家
-              this.$buyNotification.send(JSON.stringify({ SID: this.SID }))
-            })
-            .catch((err) => console.log(err))
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消购买'
-          })
-        })
-    },
-    // 2 查看购物车
-    lookCart() {
-      this.dialogFormVisible = false
-      this.visible = true
-    },
-    // 3 加入购物
-    addToCart(GID) {
-      // 没库存了
-      if (this.goodsList[this.nowEditIndex].stock === 0) {
-        this.$message({
-          type: 'info',
-          message: '没库存啦，抱歉!'
-        })
-        return
-      }
-      //
-      this.$get('/ShoppingCart/add', {
-        CID: this.$db.get('USER_ID'),
-        GID: GID
-      })
-        .then((res) => {
-          // 挑选数量现在为1
-          this.selectedNum = 1
-          this.selectedNumMap[GID] = 1
-        })
-        .catch((err) => console.log(err))
-    },
-    // 计数器
-    addCnt(GID) {
-      // 库存不够了
-      if (this.selectedNum >= this.goodsList[this.nowEditIndex].stock) {
-        this.$message({
-          type: 'info',
-          message: '库存不够了，不要太贪心哟!'
-        })
-        return
-      }
-      this.$get('/ShoppingCart/numAdd', {
-        CID: this.$db.get('USER_ID'),
-        GID: GID
-      })
-        .then((res) => {
-          this.selectedNum += 1
-          this.selectedNumMap[GID] += 1
-        })
-        .catch((err) => console.log(err))
-    },
-    subCnt(GID) {
-      // 为 0 则删掉
-      if (this.selectedNum === 1) {
-        this.$get('/ShoppingCart/deleteItem', {
-          CID: this.$db.get('USER_ID'),
-          GID: GID
-        })
-          .then((res) => {
-            this.selectedNum = 0
-            this.selectedNumMap[GID] = 0
-          })
-          .catch((err) => console.log(err))
-        return
-      }
-      //
-      this.$get('/ShoppingCart/numSub', {
-        CID: this.$db.get('USER_ID'),
-        GID: GID
-      })
-        .then((res) => {
-          this.selectedNum -= 1
-          this.selectedNumMap[GID] -= 1
-        })
-        .catch((err) => console.log(err))
-    },
-    //确定
-    submit() {
-      this.dialogFormVisible = false
-    },
-    // 智能提示
-    querySearch(queryString, cb) {
-      let goods = this.goodsList
-      let results = queryString ? goods.filter(this.createFilter(queryString)) : goods
-      // 调用 callback 返回建议列表的数据
-      cb(results)
-    },
-    createFilter(queryString) {
-      return (good) => {
-        return good.name.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
-      }
-    },
-    handleSelect(item) {
-      console.log(item)
-    },
-
-    // 排序
-    sortByPrice() {
-      this.sortType = '按价格'
-      this.dataInPage = this.dataInPage.sort((x, y) => x.price - y.price)
-    },
-    sortByCnt() {
-      this.sortType = '按热门'
-      this.dataInPage = this.dataInPage.sort((x, y) => x.buyCount - y.buyCount)
-    },
-
-    // 通信
-    sonBuy(items) {
-      // console.log("buy")
-      for (let item of items) {
-        // 视图操作
-        this.selectedNumMap[item.gid] = 0
-      }
-      // 关掉购物车
-      this.visible = false
-      // FIXME: 广播通知所有商家
-      this.$buyNotification.send(JSON.stringify({ SID: this.SID }))
-    },
-    sonAddCnt(GID) {
-      this.selectedNumMap[GID] += 1
-    },
-    sonSubCnt(GID) {
-      this.selectedNumMap[GID] -= 1
-    },
-    sonChange(row) {
-      this.$set(this.selectedNumMap, row.gid, row.num)
-      // console.log(this.selectedNumMap)
-      // console.log("change")
-      this.visible = false
-      this.visible = true
-    },
-    sonDelete(items) {
-      // console.log("delete")
-      for (let item of items) {
-        this.selectedNumMap[item.gid] = 0
-      }
-      this.visible = false
-      this.visible = true
-    },
-
-    // sb
-    getMapCnt(gid) {
-      return this.selectedNumMap[gid]
-    }
-  }
-}
-</script> -->
-
 <script setup>
-//todo
-import { ref, reactive, watch, onMounted } from 'vue'
+//todo 仔细检查一下
+import { ref, reactive, watch, onMounted, inject } from 'vue'
 import GoodsCard from '/src/components/card/GoodsCard.vue'
 import CartDialog from '/src/components/CartDialog.vue'
+import { ElMessage } from 'element-plus'
+
+//global
+const $get = inject('$get')
+const $set = inject('$set')
+const $db = inject('$db')
 
 const props = defineProps(['sid'])
 const SID = ref(1)
@@ -586,7 +271,7 @@ const refreshPage = () => {
 const showBuyCard = (GID) => {
   nowEditIndex.value = goodsList.value.findIndex((item) => item.id === GID)
   if (nowEditIndex.value === -1) {
-    $message({ type: 'info', message: '真奇怪，出错了.' })
+    ElMessage({ type: 'info', message: '真奇怪，出错了.' })
     return
   }
 
@@ -613,22 +298,22 @@ const submit = () => {
 
 // 添加到购物车
 const addToCart = (GID) => {
-  if (this.goodsList[this.nowEditIndex].stock === 0) {
-    this.$message({
+  if (goodsList[nowEditIndex].stock === 0) {
+    ElMessage({
       type: 'info',
       message: '没库存啦，抱歉!'
     })
     return
   }
   //
-  this.$get('/ShoppingCart/add', {
-    CID: this.$db.get('USER_ID'),
+  $get('/ShoppingCart/add', {
+    CID: $db.get('USER_ID'),
     GID: GID
   })
     .then((res) => {
       // 挑选数量现在为1
-      this.selectedNum = 1
-      this.selectedNumMap[GID] = 1
+      selectedNum = 1
+      selectedNumMap[GID] = 1
     })
     .catch((err) => console.log(err))
 }
@@ -636,54 +321,54 @@ const addToCart = (GID) => {
 // 计数器
 const addCnt = (GID) => {
   // 库存不够了
-  if (this.selectedNum >= this.goodsList[this.nowEditIndex].stock) {
-    this.$message({
+  if (selectedNum.value >= goodsList.value[nowEditIndex].stock) {
+    ElMessage({
       type: 'info',
       message: '库存不够了，不要太贪心哟!'
     })
     return
   }
-  this.$get('/ShoppingCart/numAdd', {
-    CID: this.$db.get('USER_ID'),
+  $get('/ShoppingCart/numAdd', {
+    CID: $db.get('USER_ID'),
     GID: GID
   })
     .then((res) => {
-      this.selectedNum += 1
-      this.selectedNumMap[GID] += 1
+      selectedNum += 1
+      selectedNumMap[GID] += 1
     })
     .catch((err) => console.log(err))
 }
 
 const subCnt = (GID) => {
   // 为 0 则删掉
-  if (this.selectedNum === 1) {
-    this.$get('/ShoppingCart/deleteItem', {
-      CID: this.$db.get('USER_ID'),
+  if (selectedNum === 1) {
+    $get('/ShoppingCart/deleteItem', {
+      CID: $db.get('USER_ID'),
       GID: GID
     })
       .then((res) => {
-        this.selectedNum = 0
-        this.selectedNumMap[GID] = 0
+        selectedNum = 0
+        selectedNumMap[GID] = 0
       })
       .catch((err) => console.log(err))
     return
   }
   //
-  this.$get('/ShoppingCart/numSub', {
-    CID: this.$db.get('USER_ID'),
+  $get('/ShoppingCart/numSub', {
+    CID: $db.get('USER_ID'),
     GID: GID
   })
     .then((res) => {
-      this.selectedNum -= 1
-      this.selectedNumMap[GID] -= 1
+      selectedNum -= 1
+      selectedNumMap[GID] -= 1
     })
     .catch((err) => console.log(err))
 }
 
 // 智能提示
 const querySearch = (queryString, cb) => {
-  let goods = this.goodsList
-  let results = queryString ? goods.filter(this.createFilter(queryString)) : goods
+  let goods = goodsList.value
+  let results = queryString ? goods.filter(createFilter(queryString)) : goods
   // 调用 callback 返回建议列表的数据
   cb(results)
 }
@@ -698,12 +383,12 @@ const handleSelect = (item) => {
 
 // 排序
 const sortByPrice = () => {
-  this.sortType = '按价格'
-  this.dataInPage = this.dataInPage.sort((x, y) => x.price - y.price)
+  sortType.value = '按价格'
+  dataInPage.value = dataInPage.value.sort((x, y) => x.price - y.price)
 }
 const sortByCnt = () => {
-  this.sortType = '按热门'
-  this.dataInPage = this.dataInPage.sort((x, y) => x.buyCount - y.buyCount)
+  sortType.value = '按热门'
+  dataInPage.value = dataInPage.value.sort((x, y) => x.buyCount - y.buyCount)
 }
 
 // 通信
@@ -711,38 +396,38 @@ const sonBuy = (items) => {
   // console.log("buy")
   for (let item of items) {
     // 视图操作
-    this.selectedNumMap[item.gid] = 0
+    selectedNumMap[item.gid] = 0
   }
   // 关掉购物车
-  this.visible = false
+  visible = false
   // FIXME: 广播通知所有商家
-  this.$buyNotification.send(JSON.stringify({ SID: this.SID }))
+  // $buyNotification.send(JSON.stringify({ SID: SID }))
 }
 const sonAddCnt = (GID) => {
-  this.selectedNumMap[GID] += 1
+  selectedNumMap[GID] += 1
 }
 const sonSubCnt = (GID) => {
-  this.selectedNumMap[GID] -= 1
+  selectedNumMap[GID] -= 1
 }
 const sonChange = (row) => {
-  this.$set(this.selectedNumMap, row.gid, row.num)
-  // console.log(this.selectedNumMap)
+  $set(selectedNumMap, row.gid, row.num)
+  // console.log(selectedNumMap)
   // console.log("change")
-  this.visible = false
-  this.visible = true
+  visible = false
+  visible = true
 }
 const sonDelete = (items) => {
   // console.log("delete")
   for (let item of items) {
-    this.selectedNumMap[item.gid] = 0
+    selectedNumMap[item.gid] = 0
   }
-  this.visible = false
-  this.visible = true
+  visible = false
+  visible = true
 }
 
 // sb
 const getMapCnt = (gid) => {
-  return this.selectedNumMap[gid]
+  return selectedNumMap[gid]
 }
 </script>
 

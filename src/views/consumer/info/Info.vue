@@ -101,38 +101,6 @@ onMounted(() => {
       console.log(err)
     })
 })
-// export default {
-//   name: 'Info',
-//   data() {
-//     return {
-//       user: {
-//         username: '',
-//         sex: '',
-//         age: '',
-//         telephone: '',
-//         email: '',
-//         address: '',
-//         balance: ''
-//       }
-//     }
-//   },
-//   methods: {
-//     welcome() {
-//       return util.welcome(this.$db.get('USER'))
-//     }
-//   },
-//   created() {
-//     this.$get('/consumer/getInfoByCid', {
-//       CID: this.$db.get('USER_ID')
-//     })
-//       .then((res) => {
-//         this.user = res.data.data
-//       })
-//       .catch((err) => {
-//         console.log(err)
-//       })
-//   }
-// }
 </script>
 
 <style scoped></style>

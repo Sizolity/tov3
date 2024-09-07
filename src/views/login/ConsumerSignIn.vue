@@ -91,7 +91,7 @@ const onSubmit = async () => {
 
   // 表单验证
   if (form.value.username === '') {
-    Notification.error({
+    ElNotification.error({
       title: '错误',
       message: '用户名不能为空',
       center: true
@@ -99,7 +99,7 @@ const onSubmit = async () => {
     return
   }
   if (form.value.password === '') {
-    Notification.error({
+    ElNotification.error({
       title: '错误',
       message: '密码不能为空',
       center: true
@@ -107,7 +107,7 @@ const onSubmit = async () => {
     return
   }
   if (form.value.password !== form.value.checkPassword) {
-    Notification.error({
+    ElNotification.error({
       title: '错误',
       message: '请输入相同的密码',
       center: true
@@ -115,7 +115,7 @@ const onSubmit = async () => {
     return
   }
   if (form.value.phone === '') {
-    Notification.error({
+    ElNotification.error({
       title: '错误',
       message: '手机号不能为空',
       center: true
@@ -123,7 +123,7 @@ const onSubmit = async () => {
     return
   }
   if (!reg.test(form.value.phone)) {
-    Notification.error({
+    ElNotification.error({
       title: '错误',
       message: '请输入正确的手机号',
       center: true
@@ -131,7 +131,7 @@ const onSubmit = async () => {
     return
   }
 
-  // FIXME: 全部验证成功，开始注册
+  // todo ? FIXME: 全部验证成功，开始注册
   try {
     const res = await $syspost('/signIn/consumer', {
       name: form.value.username,
@@ -154,7 +154,7 @@ const onSubmit = async () => {
           router.push('/index')
         })
     } else {
-      Notification.error({
+      ElNotification.error({
         title: '错误',
         message: msg,
         center: true

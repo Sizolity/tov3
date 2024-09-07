@@ -65,7 +65,7 @@ const validatePass = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请输入密码'))
   } else {
-    if (this.ruleForm.checkPass !== '') {
+    if (ruleForm.checkPass !== '') {
       ruleForm.validateField('checkPass')
     }
     callback()
@@ -111,74 +111,6 @@ const submitForm = () => {
 const resetForm = () => {
   ruleForm.value.resetFields()
 }
-
-// export default {
-//   name: 'Password',
-//   data() {
-//     const validatePass = (rule, value, callback) => {
-//       if (value === '') {
-//         callback(new Error('请输入密码'))
-//       } else {
-//         if (this.ruleForm.checkPass !== '') {
-//           this.$refs.ruleForm.validateField('checkPass')
-//         }
-//         callback()
-//       }
-//     }
-//     const validatePass2 = (rule, value, callback) => {
-//       if (value === '') {
-//         callback(new Error('请再次输入密码'))
-//       } else if (value !== this.ruleForm.pass) {
-//         callback(new Error('两次输入密码不一致!'))
-//       } else {
-//         callback()
-//       }
-//     }
-//     return {
-//       ruleForm: {
-//         oldPass: '',
-//         pass: '',
-//         checkPass: ''
-//       },
-//       rules: {
-//         pass: [{ validator: validatePass, trigger: 'blur' }],
-//         checkPass: [{ validator: validatePass2, trigger: 'blur' }]
-//       }
-//     }
-//   },
-
-//   methods: {
-//     submitForm(formName) {
-//       this.$refs[formName].validate((valid) => {
-//         if (valid) {
-//           this.$post('/consumer/changePassword', {
-//             CID: this.$db.get('USER_ID'),
-//             oldPassword: this.ruleForm.oldPass,
-//             newPassword: this.ruleForm.pass
-//           })
-//             .then((res) => {
-//               ElNotification.success({
-//                 title: '系统提示',
-//                 message: '修改成功'
-//               })
-//             })
-//             .catch((err) => {
-//               console.log(err)
-//             })
-//         } else {
-//           ElNotification.error({
-//             title: '系统提示',
-//             message: '两次密码不一致'
-//           })
-//           return false
-//         }
-//       })
-//     },
-//     resetForm(formName) {
-//       this.$refs[formName].resetFields()
-//     }
-//   }
-// }
 </script>
 
 <style scoped>

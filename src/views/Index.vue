@@ -152,7 +152,7 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { inject, ref } from 'vue'
+import { inject } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

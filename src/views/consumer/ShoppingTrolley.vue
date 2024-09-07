@@ -536,20 +536,40 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, inject } from 'vue'
 import util from '/src/utils/util'
 import ContactDialog from '/src/components/ContactDialog.vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
+// global
 const router = useRouter()
+const $get = inject('$get')
+const $db = inject('$db')
+
 const title = ref('店铺服务星级评价')
 const radio = ref('全部')
 const id = ref('')
 const activeName = ref('first')
 const value = ref('')
 
-const orderList = ref([])
+const orderList = ref([
+  {
+    cid: 1,
+    consumerName: 'Zhang San',
+    gid: 22,
+    goodsName: '烤鲈鱼',
+    id: 18,
+    num: 3,
+    picture: 'http://localhost:8080/takeout/upload/201907022120098.jpg',
+    price: 120,
+    shopName: 'mai',
+    sid: 1,
+    state: '未完成',
+    time: '2019-07-07 16:45:16',
+    total: 120
+  }
+])
 const dialogTableVisible = ref(false)
 const dialogFormVisible = ref(false)
 const form = reactive({
@@ -576,9 +596,15 @@ const formatData = ref([])
 
 // API Call in onMounted
 onMounted(() => {
-  // Assume there’s a global API function `$get`
-  const userId = localStorage.getItem('USER_ID') // Replace with your local storage retrieval or Vuex
-  fetchOrderHistory(userId)
+  $get('/consumer/getOrderHistory', {
+    CID: this.$db.get('USER_ID')
+  })
+    .then((res) => {
+      console.log(res.data)
+      this.orderList = res.data.data
+      this.formatData = util.filterByTimeAndName(this.orderList, 'time', 'shopName')
+    })
+    .catch((err) => console.log(err))
 })
 
 const fetchOrderHistory = async (userId) => {

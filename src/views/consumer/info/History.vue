@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, inject } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -55,7 +55,7 @@ let pos = ref(1) // 用于追踪合并行的位置
 const $get = inject('$get')
 
 onMounted(() => {
-  const userId = localStorage.getItem('USER_ID') // 假设从本地存储中获取用户ID
+  const userId = $get.getItem('USER_ID') // 假设从本地存储中获取用户ID
   $get('/consumer/getOrderHistory', { CID: userId })
     .then((res) => {
       history_list.value = res.data.data

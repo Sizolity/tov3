@@ -39,30 +39,6 @@ const inputAddress = () => {
     message: '地址修改成功!'
   })
 }
-
-// export default {
-//   name: "Address",
-//   data() {
-//     return {
-//       selectedOptions: [],//存放默认值
-//       options: this.GLOBAL.options,   //存放城市数据
-//       input: '',
-//       value: ''
-//     }
-//   },
-//   methods:{
-//       handleChange(value) {
-//         console.log(value);
-//       },
-//       inputAddress(){
-//         this.$message({
-//           type: 'success',
-//           message: '地址修改成功!'
-//         });
-//       }
-//   }
-
-// }
 </script>
 
 <style scoped>

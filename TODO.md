@@ -5,3 +5,7 @@
 - [ ] vuex 检查
 - [ ] element-plus 元素样式检查
 - [ ] refs相关调用
+
+- [ ] 替换localstorage
+- [ ] emit的导入
+- [ ] \`...\`引用修复

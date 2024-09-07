@@ -179,6 +179,7 @@ onMounted(() => {
   }
 
   // // 设置 websocket
+  //todo ? websocket 的使用
   // $websocket.onmessage = (res) => {
   //   // TODO: 判断是否属于自己的聊天
   //   const data = JSON.parse(res.data)

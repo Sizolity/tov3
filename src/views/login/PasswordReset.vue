@@ -106,7 +106,8 @@ const rules = {
 }
 
 // 发送验证码
-function sendCode() {
+// todo ?
+const sendcode = () => {
   const reg = /^((13|14|15|17|18)[0-9]\d{8})$/
   if (form.value.phone === '') {
     ElMessage({ message: '手机号不能为空', type: 'error', center: true })

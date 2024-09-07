@@ -51,8 +51,9 @@ function handleSuccess(res, file) {
     duration: 6000
   })
   if (file.response.success) {
+    // todo ? editor -> emit
     // 假设 editor 是在父组件中定义的
-    this.editor.picture = file.response.message // 将返回的文件储存路径赋值 picture 字段
+    editor.picture = file.response.message // 将返回的文件储存路径赋值 picture 字段
   }
 }
 
@@ -94,11 +95,6 @@ function beforeUpload(file) {
     ElMessage.error('上传图片大小不能超过 2MB!')
   }
   return (isJPG || isBMP || isGIF || isPNG) && isLt2M
-}
-
-// 让父组件通知上传 refs?
-function submitUpload() {
-  this.$refs.upload.submit()
 }
 </script>
 <style scoped>

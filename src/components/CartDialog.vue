@@ -48,15 +48,33 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { ref, reactive, onMounted, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, getCurrentInstance, inject } from 'vue'
+
+//global
+const $db = inject('$db')
+const $get = inject('$get')
 
 // 引入 props 和 emit 作为定义
 const props = defineProps(['sid'])
 const emit = defineEmits(['Buy', 'Delete', 'Change'])
 
 // 定义状态
-const cartList = ref([])
+const cartList = ref([
+  {
+    cid: 1,
+    gid: 3,
+    goodsName: '炒面',
+    num: 1,
+    picture: 'http://localhost:8080/takeout/upload/201907121000433.jpg',
+    price: 200,
+    shopName: 'mai',
+    sid: 1,
+    total: 200
+  }
+])
 const visible = ref(false)
+const multipleSelection = ref([])
+const multipleTable = ref(null)
 
 // 创建生命周期钩子
 onMounted(() => {
@@ -88,31 +106,21 @@ async function refreshData() {
 function toggleSelection(rows) {
   if (rows) {
     rows.forEach((row) => {
-      $refs.multipleTable.toggleRowSelection(row)
+      multipleTable.toggleRowSelection(row)
     })
   } else {
-    $refs.multipleTable.clearSelection()
+    multipleTable.clearSelection()
   }
 }
 
 function handleSelectionChange(val) {
-  // 由于这里的 "multipleSelection" 没有被定义，所以您可以考虑将其添加为 ref 或 reactive
-}
-
-// 添加商品到购物车
-function Add(GID) {
-  // 实现逻辑
-}
-
-// 减少商品数量
-function Sub(GID) {
-  // 实现逻辑
+  multipleSelection.value = val
 }
 
 // 购买逻辑
 async function Buy() {
   if (cartList.value.length === 0) {
-    $message({
+    ElMessage({
       type: 'info',
       message: '购物车为空'
     })

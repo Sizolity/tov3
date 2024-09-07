@@ -113,33 +113,32 @@ const commitComment = async (showItemId_, inputComment_, replyIndex_) => {
   }
 
   $get(url, {
-    uid: this.$db.get('USER_ID'),
-    coid: this.showItemId,
+    uid: $db.get('USER_ID'),
+    coid: showItemId,
     cotime: date,
-    content: this.inputComment
+    content: inputComment
   })
     .then((res) => {
       // 更新父组件视图
-      this.$emit('add', replyIndex, {
+      $emit('add', replyIndex, {
         id: String(showItemId) + String($db.get('USER_ID')), //主键id, 感觉没卵用
         commentId: comments[replyIndex].id, //父评论id，即父亲的id
         fromId: $db.get('USER_ID'), //评论者id
         fromName:
-          util.userString(this.$db.get('USER')) +
-          (this.$db.get('ROLES') === '"shop"' ? '(商家)' : ''), //评论者昵称
+          util.userString($db.get('USER')) + ($db.get('ROLES') === '"shop"' ? '(商家)' : ''), //评论者昵称
         fromAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg', //评论者头像
-        toId: this.comments[this.replyIndex].fromId, //被评论者id
-        toName: this.comments[this.replyIndex].fromName, //被评论者昵称
+        toId: comments[replyIndex].fromId, //被评论者id
+        toName: comments[replyIndex].fromName, //被评论者昵称
         toAvatar: 'http://ww4.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2pddjuj30v90uvagf.jpg', //被评论者头像
-        content: this.inputComment, //评论内容
+        content: inputComment, //评论内容
         date: date, //评论时间
-        replyRole: util.userString(this.$db.get('ROLES'))
+        replyRole: util.userString($db.get('ROLES'))
       })
       // input框变为空
-      this.inputComment = ''
+      inputComment = ''
       // 收起输入框
-      this.showItemId = ''
-      this.$message({
+      showItemId = ''
+      ElMessage({
         type: 'info',
         message: '添加成功',
         center: true
@@ -147,7 +146,7 @@ const commitComment = async (showItemId_, inputComment_, replyIndex_) => {
     })
     .catch((err) => {
       console.log(err)
-      this.$message({
+      ElMessage({
         type: 'error',
         message: '添加失败，可能出了点错误',
         center: true
@@ -159,7 +158,7 @@ const deleteComment = async (idx, reply) => {
   console.log(reply.fromId)
 
   let url = ''
-  if (this.$db.get('ROLES') === '"shop"') {
+  if ($db.get('ROLES') === '"shop"') {
     url = '/shopReply/delete'
   } else {
     url = '/consumerReply/delete'
@@ -172,14 +171,14 @@ const deleteComment = async (idx, reply) => {
   })
     .then(() => {
       $get(url, {
-        uid: this.$db.get('USER_ID'),
+        uid: $db.get('USER_ID'),
         coid: reply.commentId,
         date: reply.date
       })
         .then((res) => {
           // 更新父组件视图
-          this.$emit('remove', idx, ridx)
-          this.$message({
+          $emit('remove', idx, ridx)
+          ElMessage({
             type: 'info',
             message: '已删除',
             center: true

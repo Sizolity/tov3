@@ -160,16 +160,16 @@ const rules = {
 }
 
 // 验证密码
-// const validatePassword = (rule, value, callback) => {
-//   if (value === '') {
-//     callback(new Error('请输入密码'))
-//   } else {
-//     if (applyForm.value.checkPass !== '') {
-//       applyForm.value.validateField('checkPass')
-//     }
-//     callback()
-//   }
-// }
+const validatePassword = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入密码'))
+  } else {
+    if (applyForm.value.checkPass !== '') {
+      applyForm.value.validateField('checkPass') // ?
+    }
+    callback()
+  }
+}
 
 const validatePassword2 = (rule, value, callback) => {
   if (value === '') {
@@ -190,6 +190,7 @@ const handlePictureCardPreview = (file) => {
   dialogVisible = true
 }
 
+// !!! todo validate 验证修改
 // 注册方法
 const next = async () => {
   const reg = /^((13|14|15|17|18)[0-9]\d{8})$/

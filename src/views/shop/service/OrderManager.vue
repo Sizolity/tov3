@@ -564,6 +564,8 @@ const allConsumers = ref([])
 const searchConsumerRes = ref([])
 const switchValue = ref('0')
 
+// todo slot-scope 仔细检查源码实现
+
 // 获取历史订单
 const fetchOrderHistory = () => {
   $get('/shop/getOrderHistory', {

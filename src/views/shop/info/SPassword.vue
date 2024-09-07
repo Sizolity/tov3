@@ -58,6 +58,7 @@ const ruleForm = ref({
 })
 
 // 表单验证规则
+// todo 表单验证规则适应性修改
 const rules = {
   pass: [{ required: true, min: 6, max: 20, message: '长度为6-20个字符', trigger: 'blur' }],
   checkPass: [
@@ -66,6 +67,7 @@ const rules = {
   ]
 }
 
+// ?
 // // 密码验证函数
 // const validatePass = (rule, value, callback) => {
 //   if (value === '') {

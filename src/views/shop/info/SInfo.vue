@@ -9,20 +9,20 @@
     <el-main style="margin-left: 350px">
       <el-row>
         <el-col :span="4"><el-tag type="warning">店铺姓名</el-tag></el-col>
-        <el-col :span="4" effect="plain"
-          ><el-tag type="info" effect="plain" style="width: 200px">{{
-            user.username
-          }}</el-tag></el-col
-        >
+        <el-col :span="4" effect="plain">
+          <el-tag type="info" effect="plain" style="width: 200px">
+            {{ user.username }}
+          </el-tag>
+        </el-col>
       </el-row>
       <br />
       <el-row>
         <el-col :span="4"><el-tag type="warning">联系方式</el-tag></el-col>
         <el-col :span="4"
-          ><el-tag type="info" effect="plain" style="width: 200px">{{
-            user.telephone
-          }}</el-tag></el-col
-        >
+          ><el-tag type="info" effect="plain" style="width: 200px">
+            {{ user.telephone }}
+          </el-tag>
+        </el-col>
       </el-row>
       <br />
       <el-row>
@@ -66,7 +66,8 @@
 <script setup>
 import { ref, onMounted, inject } from 'vue'
 import util from '@/utils/util'
-import { useRouter } from 'vue-router'
+
+// todo 检查源码
 
 // global
 const $get = inject('$get')

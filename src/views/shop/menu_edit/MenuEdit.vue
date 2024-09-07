@@ -151,6 +151,8 @@ const $db = inject('$db')
 const $post = inject('$post')
 const $get = inject('$get')
 
+// todo prop slot-scope  仔细检查源码实现 和slot-scope 用法
+
 const goodsList = ref([])
 const search = ref('')
 const dialogFormVisible = ref(false)

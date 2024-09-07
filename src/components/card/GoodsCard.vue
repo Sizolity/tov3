@@ -31,16 +31,6 @@ import { defineProps } from 'vue'
 
 const props = defineProps['value']
 const good = computed(() => props.value) //只读属性 ref
-// export default {
-//   name: 'GoodsCard',
-//   props: ['value'],
-
-//   computed: {
-//     good() {
-//       return this.value
-//     }
-//   }
-// }
 </script>
 
 <style scoped>
