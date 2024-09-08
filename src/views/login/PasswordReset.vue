@@ -72,7 +72,7 @@
 
 <script setup>
 import { ref, inject } from 'vue'
-import { useAccountStore } from '../../stores/updateAccount' // Adjust path as needed
+import { useAuthStore } from '../../stores/account' // Adjust path as needed
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { jwtDecode } from 'jwt-decode'
@@ -82,7 +82,7 @@ const $syspost = inject('$syspost')
 const $db = inject('$db')
 const router = useRoute()
 
-const store = useAccountStore()
+const store = useAuthStore()
 const route = useRoute()
 
 const form = ref({

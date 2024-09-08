@@ -34,7 +34,7 @@
       </el-form-item>
 
       <el-row>
-        <div class="code" @click="router.push('/verify')">>>>手机验证码登录>>></div>
+        <el-container class="code" @click="router.push('/verify')">手机验证码登录</el-container>
       </el-row>
 
       <el-row>
@@ -43,16 +43,13 @@
       </el-row>
 
       <el-row>
-        <div class="code" style="text-align: right; color: #8c939d" @click="resetPassword">
-          Forget password?
-        </div>
+        <el-container class="code" style="text-align: right; color: #8c939d" @click="resetPassword">
+          忘记密码?点我
+        </el-container>
       </el-row>
 
       <el-dialog :model-value="dialogVisible" width="30%" v-on:close="dialogVisible = false">
-        <span>请输入用户名和密码</span>
-        <!-- <span slot="footer" class="dialog-footer">
-          <el-button type="warning" size="small" @click="dialogVisible = false">确 定</el-button>
-        </span> -->
+        请输入用户名和密码
       </el-dialog>
     </el-form>
   </div>
@@ -60,17 +57,18 @@
 
 <script setup>
 import { ref, inject } from 'vue'
-import { useAccountStore } from '../../stores/updateAccount'
+import { useAuthStore } from '../../stores/account'
 import { jwtDecode } from 'jwt-decode'
 import { ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const accountStore = useAccountStore()
+const accountStore = useAuthStore()
 
 // global
 const $syspost = inject('$syspost')
 const $db = inject('$db')
+const $post = inject('$post')
 
 // 响应式数据
 const loginForm = ref(null)
@@ -97,21 +95,16 @@ const onSubmit = () => {
     .then((res) => {
       // console.log(res, '校验成功')
       const url = radio.value === 1 ? 'consumer/login' : 'shop/login'
-      console.log(url)
-      console.log(form.value.username)
-      // ??? 无法登录
-      $syspost({
-        url,
-        data: {
-          username: form.value.username,
-          password: form.value.password
-        }
-      })
+      const data = {
+        username: form.value.username,
+        password: form.value.password
+      }
+      $syspost(url, data)
         .then((r) => {
           saveLoginData(r.data)
           // 跳转到首页并重载
           router.push('/index')
-          location.reload()
+          // location.reload()
         })
         .catch((err) => {
           ElNotification.error({
@@ -132,8 +125,9 @@ const onSubmit = () => {
 const saveLoginData = (data) => {
   const decode = jwtDecode(data.data)
 
+  console.log(data)
   accountStore.setToken(data.data)
-  accountStore.setExpireTime(decode.expire_time)
+  accountStore.setExpiretime(decode.expire_time)
   accountStore.setUser(decode.username)
   accountStore.setPermissions(decode.permission)
   accountStore.setRoles(decode.roles)

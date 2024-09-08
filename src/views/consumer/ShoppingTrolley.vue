@@ -6,7 +6,7 @@
           <el-col :offset="1">
             <el-table :data="dataInPage">
               <el-table-column type="expand" border stripe highlight-current-row>
-                <template slot-scope="props">
+                <template v-slot="props">
                   <el-form label-position="left" inline class="demo-table-expand">
                     <el-card class="box-card" v-for="card in props.row">
                       <el-form-item slot="header" label="订单编号">
@@ -65,24 +65,24 @@
                 </template>
               </el-table-column>
               <el-table-column prop="date" label="订单时间" sortable width="180" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.time }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
               </el-table-column>
               <el-table-column prop="price" label="订单总价" sortable width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.total }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button
                     v-if="
                       !scope.row.some((x) => x.state === '已完成' || x.state === '未完成') &&
@@ -118,7 +118,7 @@
               </el-table-column>
               <!--   联系       -->
               <el-table-column label="联系" width="150">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button
                     type="success"
                     size="small"
@@ -136,7 +136,7 @@
           <el-col :offset="1">
             <el-table :data="dataInPage.filter((x) => !x.some((y) => y.state !== '已完成'))">
               <el-table-column type="expand" border stripe highlight-current-row>
-                <template slot-scope="props">
+                <template v-slot="props">
                   <el-form label-position="left" inline class="demo-table-expand">
                     <el-card class="box-card" v-for="card in props.row">
                       <el-form-item slot="header" label="订单编号">
@@ -184,25 +184,25 @@
                 </template>
               </el-table-column>
               <el-table-column prop="date" label="订单时间" sortable width="180" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.time }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">
                     {{ scope.row.shopName }}
                   </el-link>
                 </template>
               </el-table-column>
               <el-table-column prop="price" label="订单总价" sortable width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.total }}</span>
                 </template>
               </el-table-column>
               <!--   联系       -->
               <el-table-column label="联系" width="150">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button
                     type="success"
                     size="small"
@@ -220,7 +220,7 @@
           <el-col :offset="1">
             <el-table :data="dataInPage.filter((x) => x.some((y) => y.state === '未完成'))">
               <el-table-column type="expand" border stripe highlight-current-row>
-                <template slot-scope="props">
+                <template v-slot="props">
                   <el-form label-position="left" inline class="demo-table-expand">
                     <el-card
                       class="box-card"
@@ -279,24 +279,24 @@
                 </template>
               </el-table-column>
               <el-table-column prop="date" label="订单时间" sortable width="180" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.time }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
               </el-table-column>
               <el-table-column prop="price" label="订单总价" sortable width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ notFinishPrice(scope.row) }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button type="warning" size="small" @click="cancelSomeOrder(scope.row)"
                     >取消</el-button
                   >
@@ -304,7 +304,7 @@
               </el-table-column>
               <!--   联系       -->
               <el-table-column label="联系" width="150">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button
                     type="success"
                     size="small"
@@ -322,7 +322,7 @@
           <el-col :offset="1">
             <el-table :data="dataInPage.filter((x) => !x.some((y) => y.state !== '已取消'))">
               <el-table-column type="expand" border stripe highlight-current-row>
-                <template slot-scope="props">
+                <template v-slot="props">
                   <el-form label-position="left" inline class="demo-table-expand">
                     <el-card class="box-card" v-for="card in props.row">
                       <el-form-item slot="header" label="订单编号">
@@ -370,25 +370,25 @@
                 </template>
               </el-table-column>
               <el-table-column prop="date" label="订单时间" sortable width="180" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.time }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
               </el-table-column>
               <el-table-column prop="price" label="订单总价" sortable width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.total }}</span>
                 </template>
               </el-table-column>
               <!--   联系       -->
               <el-table-column label="联系" width="150">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button
                     type="success"
                     size="small"
@@ -414,7 +414,7 @@
               "
             >
               <el-table-column type="expand" border stripe highlight-current-row>
-                <template slot-scope="props">
+                <template v-slot="props">
                   <el-form label-position="left" inline class="demo-table-expand">
                     <el-card class="box-card" v-for="card in props.row">
                       <el-form-item slot="header" label="订单编号">
@@ -465,24 +465,24 @@
                 </template>
               </el-table-column>
               <el-table-column prop="date" label="订单时间" sortable width="180" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.time }}</span>
                 </template>
               </el-table-column>
               <el-table-column prop="shopname" label="商家姓名" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-link @click.native="router.push(`/shop/{scope.row.sid}`)">{{
                     scope.row.shopName
                   }}</el-link>
                 </template>
               </el-table-column>
               <el-table-column prop="price" label="订单总价" sortable width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <span style="margin-left: 10px">{{ scope.row.total }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作" width="150" align="center">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button type="success" size="small" @click="readyToComment(scope.row)"
                     >评价</el-button
                   >
@@ -490,7 +490,7 @@
               </el-table-column>
               <!--   联系       -->
               <el-table-column label="联系" width="150">
-                <template slot-scope="scope">
+                <template v-slot="scope">
                   <el-button
                     type="success"
                     size="small"
@@ -597,12 +597,12 @@ const formatData = ref([])
 // API Call in onMounted
 onMounted(() => {
   $get('/consumer/getOrderHistory', {
-    CID: this.$db.get('USER_ID')
+    CID: $db.get('USER_ID')
   })
     .then((res) => {
       console.log(res.data)
-      this.orderList = res.data.data
-      this.formatData = util.filterByTimeAndName(this.orderList, 'time', 'shopName')
+      orderList.value = res.data.data
+      formatData.value = util.filterByTimeAndName(orderList.value, 'time', 'shopName')
     })
     .catch((err) => console.log(err))
 })

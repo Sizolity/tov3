@@ -1,95 +1,71 @@
 import db from '../utils/localstorage'
-
-// export default {
-//   namespaced: true,
-//   state: {
-//     token: db.get('USER_TOKEN'),
-//     expireTime: db.get('EXPIRE_TIME'),
-//     user: db.get('USER'),
-//     permissions: db.get('PERMISSIONS'),
-//     roles: db.get('ROLES'),
-//     id: db.get('USER_ID'),
-//     info: db.get('USER_INFO')
-//   },
-//   mutations: {
-//     setToken (state, val) {
-//       db.save('USER_TOKEN', val)
-//       state.token = val
-//     },
-//     setExpireTime (state, val) {
-//       db.save('EXPIRE_TIME', val)
-//       state.expireTime = val
-//     },
-//     setUser (state, val) {
-//       db.save('USER', val)
-//       state.user = val
-//     },
-//     setPermissions (state, val) {
-//       db.save('PERMISSIONS', val)
-//       state.permissions = val
-//     },
-//     setRoles (state, val) {
-//       db.save('ROLES', val)
-//       state.roles = val
-//     },
-//     setId(state, val) {
-//       db.save('USER_ID', val)
-//       state.id = val
-//     },
-//     setInfo(state, val) {
-//       db.save('USER_INFO', val)
-//       state.info = val
-//     }
-//   }
-// }
-
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 export const useAuthStore = defineStore(
-  'account',
-  {
-    state: () => ({
-      token: null,
-      expireTime: null,
-      user: null,
-      permissions: null,
-      roles: null,
-      id: null,
-      info: null
-    }),
-    getters: {
-      // 在这里定义派生状态
-    },
-    actions: {
-      // 在这里定义异步操作
-      setToken(state, val) {
-        db.save('USER_TOKEN', val)
-        state.token = val
-      },
-      setExpireTime(state, val) {
-        db.save('EXPIRE_TIME', val)
-        state.expireTime = val
-      },
-      setUser(state, val) {
-        db.save('USER', val)
-        state.user = val
-      },
-      setPermissions(state, val) {
-        db.save('PERMISSIONS', val)
-        state.permissions = val
-      },
-      setRoles(state, val) {
-        db.save('ROLES', val)
-        state.roles = val
-      },
-      setId(state, val) {
-        db.save('USER_ID', val)
-        state.id = val
-      },
-      setInfo(state, val) {
-        db.save('USER_INFO', val)
-        state.info = val
-      }
+  'updateAccount',
+  () => {
+    const token = ref('')
+    const expireTime = ref('.0')
+    const permissions = ref([])
+    const roles = ref([])
+    const user = ref('')
+    const id = ref(null)
+    const info = ref('')
+
+    // getter
+
+    //setter
+    function setToken(data) {
+      token.value = data.token
+      db.save('USER_TOKEN', data)
+    }
+
+    function setExpiretime(data) {
+      expireTime.value = data
+      db.save('EXPIRE_TIME', data)
+    }
+
+    function setPermissions(data) {
+      permissions.value = data
+      db.save('PERMISSIONS', data)
+    }
+
+    function setRoles(data) {
+      roles.value = data
+      db.save('ROLES', data)
+    }
+
+    function setUser(data) {
+      user.value = data
+      db.save('USER', data)
+    }
+
+    function setId(data) {
+      id.value = data
+      db.save('USER_ID', data)
+    }
+
+    function setInfo(data) {
+      info.value = data
+      db.save('USER_INFO', data)
+    }
+    return {
+      token,
+      expireTime,
+      permissions,
+      roles,
+      user,
+      id,
+      info,
+      //setter
+      setToken,
+      setExpiretime,
+      setPermissions,
+      setRoles,
+      setUser,
+      setId,
+      setInfo
     }
   },
   { persist: true }

@@ -154,12 +154,16 @@
 import { ElMessage } from 'element-plus'
 import { inject } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/account'
 
+// global
 const router = useRouter()
-const db = inject('$db')
+
+// 用户信息 pinia
+const authStore = useAuthStore()
 
 const onService = () => {
-  const roles = db.get('ROLES')
+  const roles = authStore.roles
   if (Object.keys(roles).length === 0) {
     ElMessage({
       message: '请先登录'

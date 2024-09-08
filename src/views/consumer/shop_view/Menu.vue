@@ -96,7 +96,7 @@
               <span style="float: left; padding: 18px 0">{{ o.name }}</span>
               <el-button
                 style="float: right; padding: 20px 0"
-                type="text"
+                type="primary"
                 @click="showBuyCard(o.id, index)"
                 >选规格</el-button
               >
@@ -108,7 +108,7 @@
                 v-show="getMapCnt(o.id) > 0"
                 @click="showBuyCard(o.id, index)"
                 round
-                size="mini"
+                size="small"
                 style="float: right"
                 >{{ getMapCnt(o.id) }}</el-button
               >
@@ -130,7 +130,7 @@
       <div slot="footer" class="dialog-footer">
         <!--    选择数量为零或不为零    -->
         <el-button
-          size="mini"
+          size="small"
           v-if="selectedNum === 0"
           type="warning"
           @click="addToCart(goodsList[nowEditIndex].id)"
@@ -142,7 +142,7 @@
             icon="el-icon-minus"
             @click="subCnt(goodsList[nowEditIndex].id)"
             circle
-            size="mini"
+            size="small"
           ></el-button>
           <el-tag type="info" style="width: 100px">{{ selectedNum }}</el-tag>
           <el-button
@@ -150,14 +150,14 @@
             icon="el-icon-plus"
             @click="addCnt(goodsList[nowEditIndex].id)"
             circle
-            size="mini"
+            size="small"
             style="background-color: #ebb563; border-color: #ebb563"
           ></el-button>
           <el-button
             type="primary"
             v-show="selectedNum > 0"
             @click="submit"
-            size="mini"
+            size="small"
             class="dia-btn"
             >确定</el-button
           >
@@ -165,11 +165,11 @@
             type="primary"
             v-show="selectedNum > 0"
             @click="buy(goodsList[nowEditIndex].id, new Date().Format('yyyy-MM-dd hh:mm:ss'))"
-            size="mini"
+            size="small"
             class="dia-btn"
             >直接购买</el-button
           >
-          <el-button size="mini" style="float: right" type="success" @click="lookCart"
+          <el-button size="small" style="float: right" type="success" @click="lookCart"
             ><i class="el-icon-shopping-cart-1"> 购物车</i></el-button
           >
         </template>
@@ -186,7 +186,6 @@ import { ElMessage } from 'element-plus'
 
 //global
 const $get = inject('$get')
-const $set = inject('$set')
 const $db = inject('$db')
 
 const props = defineProps(['sid'])
@@ -198,7 +197,7 @@ const visible = ref(false)
 const dialogFormVisible = ref(false)
 const nowEditIndex = ref(0)
 const selectedNum = ref(0)
-const selectedNumMap = reactive({})
+const selectedNumMap = ref({})
 
 // 输入框
 const radio = ref('全部')
@@ -237,6 +236,16 @@ watch(
     refreshPage()
   }
 )
+
+// 搜索
+const searchGoods = () => {
+  // console.log(this.radio)
+  dataInPage.value = goodsList.value.filter(
+    (data) =>
+      (radio.value === '全部' || data.type === radio) &&
+      (!input.value || data.name.toLowerCase().includes(this.input.toLowerCase()))
+  )
+}
 
 // 刷新页面
 const refreshPage = () => {
@@ -410,10 +419,9 @@ const sonSubCnt = (GID) => {
   selectedNumMap[GID] -= 1
 }
 const sonChange = (row) => {
-  $set(selectedNumMap, row.gid, row.num)
+  selectedNumMap[row.id] = row.num
   // console.log(selectedNumMap)
   // console.log("change")
-  visible = false
   visible = true
 }
 const sonDelete = (items) => {

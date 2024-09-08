@@ -91,5 +91,5 @@ app.config.globalProperties.routerAppend = (path, pathToAppend) => {
 // db.save('USER', 'liznsalt')
 // db.save('USER_ROUTER', [1])
 
-console.log(db.get('USER'))
+// console.log(db.get('USER'))
 app.mount('#app')

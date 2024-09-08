@@ -94,10 +94,11 @@ import Menu from './Menu.vue'
 import Commentary from './Commentary.vue'
 import ContactDialog from '@/components/ContactDialog.vue'
 import { inject, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // 路由
 const router = useRouter()
+const route = useRoute()
 
 // global
 const $get = inject('$get')
@@ -121,15 +122,15 @@ const shop = ref({
 })
 
 onMounted(() => {
-  SID.value = router.params.SID
+  SID.value = route.params.id
   refreshPage()
 })
 
 //todo
 watch(
-  () => router(to, from),
-  () => {
-    SID.value = router.params.SID
+  () => route.params.id,
+  (newId) => {
+    SID.value = newId
     refreshPage()
   }
 )

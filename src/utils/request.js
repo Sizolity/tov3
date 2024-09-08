@@ -5,9 +5,9 @@ import { useAuthStore } from '../stores/account'
 import moment from 'moment'
 moment.locale('zh-cn')
 
-// 统一配置
-let REQUEST = axios.create({
-  baseURL: 'http://localhost:8080/takeout/',
+// 统一配置 拦截器
+const REQUEST = axios.create({
+  baseURL: '/api',
   responseType: 'json',
   validateStatus(status) {
     // 200 外的状态码都认定为失败
@@ -15,8 +15,8 @@ let REQUEST = axios.create({
   }
 })
 
-/////////////////
-let SYS_REQUEST = axios.create({
+// ?
+const SYS_REQUEST = axios.create({
   baseURL: 'http://localhost:8080/takeout/',
   responseType: 'json',
   validateStatus(status) {
@@ -29,7 +29,7 @@ REQUEST.interceptors.request.use(
   (config) => {
     const useStore = useAuthStore()
 
-    let expireTime = useStore.$state.expireTime
+    let expireTime = useStore.expireTime
     let now = new Date().valueOf()
     // 让token早10秒种过期，提升“请重新登录”弹窗体验
     if (now - expireTime >= -10 * 1000) {
@@ -163,6 +163,7 @@ const request = {
               result += encodeURIComponent(key) + '=' + encodeURIComponent(params[key]) + '&'
             }
           })
+          // console.log(result)
           return result
         }
       ],
