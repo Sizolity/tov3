@@ -1,11 +1,11 @@
-- [ ] 组件内部顶层全局变量,函数调用
-      element-plus 消息框
-
-- [ ] 内部文件引用,路径问题
-- [ ] vuex 检查
+- [x] 组件内部顶层全局变量,函数调用
+      vue2 -> vue3 特性更迭
+- [x] 内部文件引用,路径问题
+- [x] vuex 检查
 - [ ] element-plus 元素样式检查
-- [ ] refs相关调用
-
-- [ ] 替换localstorage
-- [ ] emit的导入
+- [x] refs相关调用 refs 参见vue3 ref使用
+- [x] emit的导入
+- [ ] pinia 的全局状态管理(替换localstorage) 最后考虑
 - [ ] \`...\`引用修复
+- [ ] 整体界面调整, element-plus组件适应性调整
+- [ ] 商家界面功能整体调试修复
